@@ -28,6 +28,7 @@ export function useBookingDraft({
     barberId: initialBarberId ?? ANY_BARBER_ID,
     date: today,
     time: DEFAULT_TIME_SLOT,
+    chairId: null,
     notes: '',
   }));
 

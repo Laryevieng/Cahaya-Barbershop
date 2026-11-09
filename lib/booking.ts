@@ -1,5 +1,6 @@
 import { BARBERS_DATA, BRANCHES_DATA, SERVICES_DATA, SHOP_INFO } from '@/data';
-import type { BookingDraft, ServiceSelection } from '@/types/barbershop';
+import type { BookingDraft, PublicBooking, ServiceSelection } from '@/types/barbershop';
+import { formatDateIndonesian } from '@/lib/date';
 
 export const ANY_BARBER_LABEL = 'Any Master Barber';
 
@@ -34,6 +35,23 @@ Saya ingin melakukan reservasi grooming / styling:
 ${draft.notes ? `• Catatan Khusus: ${draft.notes}` : ''}
 
 Mohon konfirmasi ketersediaan jadwal di cabang ${branch}. Terima kasih!`;
+}
+
+export function buildShortWhatsAppBookingMessage(booking: PublicBooking): string {
+  const branch = getBranchLabel(booking.branch_id);
+  const formattedDate = formatDateIndonesian(booking.booking_date, { withWeekday: true });
+  const chairInfo = booking.chair_label || (booking.booking_mode === 'consultation' ? 'Konsultasi' : 'Kursi');
+
+  return `Halo Cahaya Barbershop, saya telah membuat reservasi di website:
+• Kode: ${booking.code}
+• Nama: ${booking.customer_name}
+• Cabang: ${branch}
+• Kursi: ${chairInfo}
+• Jadwal: ${formattedDate}, ${booking.start_time.slice(0, 5)} WIB
+• Layanan: ${booking.service_name}
+• Barber: ${booking.barber_name || 'Any'}
+
+Mohon konfirmasi pesanan saya. Terima kasih!`;
 }
 
 export function buildWhatsAppUrl(message: string): string {

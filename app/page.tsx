@@ -21,7 +21,7 @@ import { useTodayISO } from '@/hooks/useTodayISO';
 
 export default function Home() {
   const today = useTodayISO();
-  const { draft, setField } = useBookingDraft({ today });
+  const { draft, setField, reset } = useBookingDraft({ today });
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -79,8 +79,13 @@ export default function Home() {
       {/* Testimonials Carousel */}
       <ReviewsSection />
 
-      {/* WhatsApp Online Booking System */}
-      <BookingSection draft={draft} today={today} setField={setField} />
+      {/* Supabase 3-Column Online Booking System */}
+      <BookingSection
+        draft={draft}
+        today={today}
+        setField={setField}
+        onReset={reset}
+      />
 
       {/* Grooming Articles & Guides */}
       <BlogSection />

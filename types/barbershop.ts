@@ -1,5 +1,14 @@
 export type ServiceCategory = 'haircut' | 'color' | 'others';
 
+export type BookingMode = 'chair' | 'consultation';
+
+export type BookingStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'completed'
+  | 'cancelled'
+  | 'expired';
+
 export type ServiceIconName =
   | 'Scissors'
   | 'Sparkles'
@@ -20,6 +29,8 @@ export interface ServiceItem {
   pricePrefix?: 'Mulai';
   priceSuffix?: '+';
   time?: string;
+  durationMinutes: number;
+  bookingMode?: BookingMode;
   desc: string;
   iconName: ServiceIconName;
   tag?: string;
@@ -103,7 +114,75 @@ export interface BookingDraft {
   barberId: string;
   date: string;
   time: string;
+  chairId: string | null;
   notes: string;
+}
+
+export interface Chair {
+  id: string;
+  label: string;
+}
+
+export type SlotUnavailableReason =
+  | 'past'
+  | 'outside_hours'
+  | 'full'
+  | 'barber_busy';
+
+export interface AvailabilityChair extends Chair {
+  available: boolean;
+}
+
+export interface AvailabilitySlot {
+  time: string;
+  available: boolean;
+  reason?: SlotUnavailableReason;
+  chairs: AvailabilityChair[];
+}
+
+export interface AvailabilityResponse {
+  branchId: string;
+  date: string;
+  serviceId: string;
+  mode: BookingMode;
+  chairs: Chair[];
+  slots: AvailabilitySlot[];
+}
+
+export interface PublicBooking {
+  id: string;
+  code: string;
+  branch_id: string;
+  service_id: string | null;
+  barber_id: number | null;
+  chair_id: string | null;
+  booking_date: string;
+  start_time: string;
+  end_time: string;
+  customer_name: string;
+  customer_phone: string;
+  notes: string | null;
+  status: BookingStatus;
+  booking_mode: BookingMode;
+  expires_at: string | null;
+  confirmed_at: string | null;
+  completed_at: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string | null;
+  service_name: string;
+  price_idr: number;
+  duration_min: number;
+  barber_name: string | null;
+  chair_label: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminBooking extends PublicBooking {
+  branches?: { name: string; short_name: string } | null;
+  services?: { name: string } | null;
+  barbers?: { name: string } | null;
+  chairs?: { label: string } | null;
 }
 
 export interface ShopFeature {

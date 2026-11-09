@@ -1,381 +1,593 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import {
-  Calendar,
-  Clock,
-  MapPin,
+  Building2,
   Phone,
   User,
   MessageSquare,
   CheckCircle2,
-  Building2,
+  ShieldCheck,
+  AlertCircle,
+  Armchair,
+  ArrowRight,
+  MapPin,
 } from 'lucide-react';
-import { SERVICES_DATA, BARBERS_DATA, BRANCHES_DATA, SHOP_INFO, TIME_SLOTS } from '@/data';
-import { buildBookingMessage, buildWhatsAppUrl } from '@/lib/booking';
+import { SERVICES_DATA, BRANCHES_DATA } from '@/data';
 import { formatServicePrice } from '@/lib/format';
-import type { BookingDraft } from '@/types/barbershop';
+import type {
+  BookingDraft,
+  BookingMode,
+  PublicBooking,
+  AvailabilityResponse,
+} from '@/types/barbershop';
 
-const CUSTOM_SERVICE_VALUE = '__custom_look__';
+import ServiceCarousel from './ServiceCarousel';
+import BarberCarousel from './BarberCarousel';
+import DateStrip from './DateStrip';
+import TimeGrid from './TimeGrid';
+import ChairSelector from './ChairSelector';
+import BookingSuccessModal from './BookingSuccessModal';
 
 interface BookingSectionProps {
   draft: BookingDraft;
   today: string;
   setField: <K extends keyof BookingDraft>(field: K, value: BookingDraft[K]) => void;
+  onReset?: () => void;
 }
 
-export default function BookingSection({ draft, today, setField }: BookingSectionProps) {
-  const [notice, setNotice] = useState(false);
-  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+export default function BookingSection({
+  draft,
+  today,
+  setField,
+  onReset,
+}: BookingSectionProps) {
+  // Availability state
+  const [availability, setAvailability] = useState<AvailabilityResponse | null>(null);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (noticeTimer.current !== null) {
-        clearTimeout(noticeTimer.current);
-      }
-    };
-  }, []);
+  // Form submission state
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [createdBooking, setCreatedBooking] = useState<PublicBooking | null>(null);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!draft.name.trim() || !draft.phone.trim()) return;
+  const selectedServiceId =
+    draft.service.kind === 'catalog' ? draft.service.id : 'custom-look';
 
-    const waUrl = buildWhatsAppUrl(buildBookingMessage(draft));
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
-
-    setNotice(true);
-    if (noticeTimer.current !== null) {
-      clearTimeout(noticeTimer.current);
+  const currentServiceItem = useMemo(() => {
+    if (draft.service.kind === 'catalog') {
+      const catalogId = draft.service.id;
+      return SERVICES_DATA.find((s) => s.id === catalogId);
     }
-    noticeTimer.current = setTimeout(() => setNotice(false), 1400);
+    return null;
+  }, [draft.service]);
+
+  const mode: BookingMode = useMemo(() => {
+    if (draft.service.kind === 'custom') return 'consultation';
+    return currentServiceItem?.bookingMode ?? 'chair';
+  }, [draft.service, currentServiceItem]);
+
+  // Keep stable refs for slot auto-adjustment without triggering re-fetch
+  const currentSlotSelectionRef = useRef({ time: draft.time, chairId: draft.chairId });
+  useEffect(() => {
+    currentSlotSelectionRef.current = { time: draft.time, chairId: draft.chairId };
+  }, [draft.time, draft.chairId]);
+
+  const setFieldRef = useRef(setField);
+  useEffect(() => {
+    setFieldRef.current = setField;
+  }, [setField]);
+
+  // Fetch live availability whenever branch, date, service, or barber changes
+  useEffect(() => {
+    let ignore = false;
+    const controller = new AbortController();
+
+    async function fetchAvailability() {
+      setLoadingAvailability(true);
+      setAvailabilityError(null);
+
+      try {
+        const query = new URLSearchParams({
+          branchId: draft.branchId,
+          date: draft.date,
+          serviceId: selectedServiceId,
+          barberId: draft.barberId,
+        });
+
+        const res = await fetch(`/api/availability?${query.toString()}`, {
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Gagal memuat ketersediaan');
+        }
+
+        const data: AvailabilityResponse = await res.json();
+        if (!ignore) {
+          setAvailability(data);
+
+          const { time, chairId } = currentSlotSelectionRef.current;
+
+          // Check if currently selected time is valid
+          const currentSlot = data.slots.find((s) => s.time === time);
+          if (!currentSlot?.available) {
+            const firstAvailable = data.slots.find((s) => s.available);
+            if (firstAvailable) {
+              setFieldRef.current('time', firstAvailable.time);
+            }
+          }
+
+          // If current chair is occupied at this time, reset chair selection
+          if (chairId && currentSlot) {
+            const chairStatus = currentSlot.chairs.find((c) => c.id === chairId);
+            if (!chairStatus?.available) {
+              setFieldRef.current('chairId', null);
+            }
+          }
+        }
+      } catch (err: unknown) {
+        if (!ignore && (err as Error).name !== 'AbortError') {
+          setAvailabilityError((err as Error).message || 'Gagal mengecek jadwal');
+        }
+      } finally {
+        if (!ignore) {
+          setLoadingAvailability(false);
+        }
+      }
+    }
+
+    fetchAvailability();
+
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [draft.branchId, draft.date, selectedServiceId, draft.barberId]);
+
+  // Handle branch change: clear chair
+  const handleBranchSelect = (branchId: string) => {
+    setField('branchId', branchId);
+    setField('chairId', null);
   };
 
-  const haircuts = SERVICES_DATA.filter((service) => service.category === 'haircut');
-  const colors = SERVICES_DATA.filter((service) => service.category === 'color');
-  const others = SERVICES_DATA.filter((service) => service.category === 'others');
-  const serviceValue =
-    draft.service.kind === 'catalog' ? draft.service.id : CUSTOM_SERVICE_VALUE;
+  // Handle service change: clear chair
+  const handleServiceSelect = (selection: BookingDraft['service']) => {
+    setField('service', selection);
+    setField('chairId', null);
+  };
+
+  // Handle barber change: clear chair
+  const handleBarberSelect = (barberId: string) => {
+    setField('barberId', barberId);
+    setField('chairId', null);
+  };
+
+  // Handle time change: clear chair
+  const handleTimeSelect = (time: string) => {
+    setField('time', time);
+    setField('chairId', null);
+  };
+
+  // Handle form submission
+  const handleSubmitBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError(null);
+
+    // Basic frontend checks
+    if (!draft.name.trim()) {
+      setSubmitError('Nama pemesan harus diisi.');
+      return;
+    }
+    if (!draft.phone.trim()) {
+      setSubmitError('Nomor WhatsApp harus diisi.');
+      return;
+    }
+    if (mode === 'chair' && !draft.chairId) {
+      setSubmitError('Silakan pilih salah satu kursi yang tersedia di kolom jadwal.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const payload = {
+        branchId: draft.branchId,
+        serviceId: selectedServiceId,
+        barberId: draft.barberId,
+        chairId: mode === 'chair' ? draft.chairId : null,
+        date: draft.date,
+        time: draft.time,
+        name: draft.name.trim(),
+        phone: draft.phone.trim(),
+        notes: draft.notes.trim() || undefined,
+      };
+
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 409 || data.code === 'SLOT_TAKEN') {
+          setSubmitError(
+            'Slot kursi pada jam ini baru saja diambil pelanggan lain. Silakan pilih kursi atau jam lainnya.'
+          );
+          setField('chairId', null);
+        } else {
+          setSubmitError(data.error || 'Gagal memproses booking. Silakan coba lagi.');
+        }
+        setSubmitting(false);
+        return;
+      }
+
+      setCreatedBooking(data.booking);
+    } catch {
+      setSubmitError('Terjadi kendala koneksi ke server. Silakan coba beberapa saat lagi.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const selectedBranch =
+    BRANCHES_DATA.find((b) => b.id === draft.branchId) || BRANCHES_DATA[0];
+
+  const priceFormatted = currentServiceItem
+    ? formatServicePrice(currentServiceItem)
+    : draft.service.kind === 'custom'
+    ? 'Konsultasi (Mulai Rp 0)'
+    : 'Rp 45.000';
 
   return (
-    <section id="booking" className="py-28 bg-[#050505] relative overflow-hidden">
-      {/* Background Lighting */}
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+    <section
+      id="booking"
+      className="py-20 sm:py-24 bg-[#050505] text-[#ededed] relative overflow-hidden"
+    >
+      {/* Background Ambience */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[#1e5eff]/10 rounded-full blur-[140px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-[#1e5eff]/10 border border-[#1e5eff]/30 text-[#1e5eff]">
+            <Armchair className="w-3.5 h-3.5" />
+            <span>Booking Online · 3 Cabang · 3 Kursi Per Cabang</span>
+          </div>
 
-          {/* Left Info Column */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7 }}
-            className="lg:col-span-5 space-y-6"
-          >
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-500/30 text-blue-400 text-xs font-bold tracking-widest uppercase">
-              <div className="w-4 h-4 rounded-full overflow-hidden border border-blue-400/40 shrink-0">
-                <img src="/images/logo.png" alt="Logo" className="w-full h-full object-cover" />
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white font-serif">
+            Pilih Kursi,{' '}
+            <span className="text-[#1e5eff] italic">Amankan Jadwal.</span>
+          </h2>
+
+          <p className="text-xs sm:text-sm text-white/60 leading-relaxed">
+            Sistem reservasi real-time Cahaya Barbershop. Setiap cabang memiliki 3 kursi khusus. Pilih cabang, layanan, dan barber pilihan Anda, lalu kunci kursi dan jam kunjungan. Slot otomatis kedaluwarsa setelah 24 jam bila belum dikonfirmasi.
+          </p>
+        </div>
+
+        {/* 3-Column Layout Grid */}
+        <form
+          onSubmit={handleSubmitBooking}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          {/* ============================================================== */}
+          {/* KOLOM 1: INFO, PILIH CABANG & LANGKAH OPERASIONAL (lg:col-span-4) */}
+          {/* ============================================================== */}
+          <div className="lg:col-span-4 space-y-5">
+            {/* Cabang Selector Card */}
+            <div className="bg-[#0c0c14] border border-white/10 rounded-2xl p-5 space-y-4">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-white/70 block flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-[#1e5eff]" />
+                  <span>Pilih Cabang Barbershop</span>
+                </label>
+                <span className="text-[11px] text-white/40">
+                  3 lokasi strategis di Kabupaten Kuningan
+                </span>
               </div>
-              <span>RESERVASI ONLINE 3 CABANG</span>
+
+              <div className="space-y-2">
+                {BRANCHES_DATA.map((branch) => {
+                  const isSelected = draft.branchId === branch.id;
+
+                  return (
+                    <button
+                      key={branch.id}
+                      type="button"
+                      onClick={() => handleBranchSelect(branch.id)}
+                      className={`w-full p-3.5 rounded-xl border text-left transition relative cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#1e5eff]/15 border-[#1e5eff] shadow-lg shadow-[#1e5eff]/15'
+                          : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.04]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-white">
+                              {branch.name}
+                            </span>
+                            {branch.isMain && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#1e5eff]/20 text-[#82aaff] border border-[#1e5eff]/30">
+                                UTAMA
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-white/50 mt-1 line-clamp-1 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 shrink-0 text-[#1e5eff]" />
+                            <span>{branch.address}</span>
+                          </p>
+                          <p className="text-[10px] text-white/40 mt-1">
+                            {branch.hours} · 3 Kursi
+                          </p>
+                        </div>
+
+                        {isSelected && (
+                          <div className="w-4 h-4 rounded-full bg-[#1e5eff] text-white flex items-center justify-center shrink-0 mt-0.5">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-white leading-tight">
-              Siap Tampil <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-200">
-                Lebih Percaya Diri?
-              </span>
-            </h2>
+            {/* Prosedur & Aturan Reservasi */}
+            <div className="bg-[#0c0c14] border border-white/10 rounded-2xl p-5 space-y-3.5">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-white/70 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#1e5eff]" />
+                <span>Aturan Reservasi Online</span>
+              </h4>
 
-            <p className="text-gray-300 text-sm sm:text-base font-light leading-relaxed">
-              Reservasi kursi Anda di cabang terdekat secara instan dalam 60 detik. Detail jadwal Anda akan langsung terhubung ke WhatsApp resmi Cahaya Barbershop untuk konfirmasi cepat tanpa perlu antre lama.
-            </p>
+              <div className="space-y-3 text-xs">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-[#1e5eff]/15 text-[#1e5eff] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <p className="text-white/60 leading-relaxed">
+                    <strong className="text-white">Pilih Kursi Fisik:</strong> Tiap cabang memiliki tepat 3 kursi yang dapat dipilih secara manual sesuai jadwal.
+                  </p>
+                </div>
 
-            {/* Quick Info Badges */}
-            <div className="space-y-4 pt-4">
-              <div className="flex items-start space-x-4 p-4 rounded-xl bg-[#0c0c10] border border-white/5">
-                <div className="p-3 rounded-lg bg-blue-950/60 border border-blue-500/30 text-blue-400 shrink-0">
-                  <Building2 size={20} />
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-[#1e5eff]/15 text-[#1e5eff] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <p className="text-white/60 leading-relaxed">
+                    <strong className="text-white">Batas Waktu 24 Jam:</strong> Booking yang berstatus pending akan otomatis kedaluwarsa setelah 24 jam bila belum dikonfirmasi via WhatsApp.
+                  </p>
                 </div>
-                <div>
-                  <h4 className="font-bold text-white text-sm">3 Cabang Aktif</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">Manislor (Utama) • Jagabaya • Jalaksana</p>
-                  <span className="inline-block text-[10px] text-emerald-400 font-bold mt-1">● Semua Cabang Buka Setiap Hari</span>
-                </div>
-              </div>
 
-              <div className="flex items-start space-x-4 p-4 rounded-xl bg-[#0c0c10] border border-white/5">
-                <div className="p-3 rounded-lg bg-blue-950/60 border border-blue-500/30 text-blue-400 shrink-0">
-                  <Clock size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-white text-sm">Jam Operasional</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">{SHOP_INFO.hours.weekdays}</p>
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-full bg-[#1e5eff]/15 text-[#1e5eff] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <p className="text-white/60 leading-relaxed">
+                    <strong className="text-white">Bulan Berjalan:</strong> Reservasi dibuka khusus untuk tanggal-tanggal di bulan berjalan ini agar akurasi rotasi kapster terjaga.
+                  </p>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Right Form Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7 }}
-            className="lg:col-span-7 bg-[#0c0c12] rounded-3xl p-5 sm:p-8 lg:p-10 border border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.9)] relative"
-          >
-            {/* Success Alert Banner */}
-            <AnimatePresence>
-              {notice && (
-                <motion.div
-                  role="status"
-                  aria-live="polite"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mb-6 p-4 rounded-xl bg-emerald-950/90 border border-emerald-500 text-emerald-200 text-xs font-semibold flex items-center space-x-3 shadow-lg"
-                >
-                  <CheckCircle2 size={20} className="text-emerald-400 shrink-0" />
-                  <span>Membuka WhatsApp Cahaya Barbershop untuk konfirmasi reservasi Anda...</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* ============================================================== */}
+          {/* KOLOM 2: PILIHAN LAYANAN, BARBER & IDENTITAS (lg:col-span-5)  */}
+          {/* ============================================================== */}
+          <div className="lg:col-span-5 bg-[#0c0c14] border border-white/10 rounded-2xl p-5 sm:p-6 space-y-6">
+            {/* Service Carousel */}
+            <ServiceCarousel
+              selectedService={draft.service}
+              onSelect={handleServiceSelect}
+            />
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Barber Carousel */}
+            <BarberCarousel
+              selectedBarberId={draft.barberId}
+              onSelect={handleBarberSelect}
+            />
 
-              {/* Row 1: Name & Phone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-                <div className="space-y-2">
+            {/* Customer Contact Form */}
+            <div className="space-y-3 pt-4 border-t border-white/10">
+              <label className="text-xs font-semibold uppercase tracking-wider text-white/70 block flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#1e5eff]" />
+                <span>3. Data Pemesan</span>
+              </label>
+
+              <div className="space-y-3">
+                <div>
                   <label
-                    htmlFor="booking-name"
-                    className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center space-x-1"
+                    htmlFor="customer-name"
+                    className="block text-[11px] text-white/60 mb-1"
                   >
-                    <span>Nama Lengkap</span>
-                    <span className="text-blue-400">*</span>
+                    Nama Lengkap <span className="text-rose-400">*</span>
                   </label>
                   <div className="relative">
-                    <User size={18} className="absolute left-3.5 top-3.5 text-gray-500" />
+                    <User className="w-4 h-4 text-white/30 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
-                      id="booking-name"
+                      id="customer-name"
                       type="text"
-                      required
-                      placeholder="e.g. Budi Santoso"
                       value={draft.name}
                       onChange={(e) => setField('name', e.target.value)}
-                      className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                      placeholder="Contoh: Budi Santoso"
+                      required
+                      className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#1e5eff]"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div>
                   <label
-                    htmlFor="booking-phone"
-                    className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center space-x-1"
+                    htmlFor="customer-phone"
+                    className="block text-[11px] text-white/60 mb-1"
                   >
-                    <span>Nomor WhatsApp</span>
-                    <span className="text-blue-400">*</span>
+                    Nomor WhatsApp <span className="text-rose-400">*</span>
                   </label>
                   <div className="relative">
-                    <Phone size={18} className="absolute left-3.5 top-3.5 text-gray-500" />
+                    <Phone className="w-4 h-4 text-white/30 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
-                      id="booking-phone"
+                      id="customer-phone"
                       type="tel"
-                      required
-                      placeholder="e.g. 085221239852"
                       value={draft.phone}
                       onChange={(e) => setField('phone', e.target.value)}
-                      className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 2: Branch & Service Selection */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-
-                {/* Branch Selection */}
-                <div className="space-y-2">
-                  <label
-                    htmlFor="booking-branch"
-                    className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center space-x-1"
-                  >
-                    <span>Pilih Cabang</span>
-                    <span className="text-blue-400">*</span>
-                  </label>
-                  <div className="relative">
-                    <MapPin size={18} className="absolute left-3.5 top-3.5 text-gray-500" />
-                    <select
-                      id="booking-branch"
-                      value={draft.branchId}
-                      onChange={(e) => setField('branchId', e.target.value)}
-                      className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
-                    >
-                      {BRANCHES_DATA.map((branch) => (
-                        <option key={branch.id} value={branch.id} className="bg-[#0e0e14]">
-                          {branch.name} {branch.isMain ? '(Pusat)' : ''}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Service Selection */}
-                <div className="space-y-2">
-                  <label
-                    htmlFor="booking-service"
-                    className="text-xs font-bold text-gray-300 uppercase tracking-wider"
-                  >
-                    Pilihan Layanan
-                  </label>
-                  <select
-                    id="booking-service"
-                    value={serviceValue}
-                    onChange={(e) => {
-                      if (e.target.value === CUSTOM_SERVICE_VALUE) return;
-                      setField('service', { kind: 'catalog', id: e.target.value });
-                    }}
-                    className="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
-                  >
-                    {draft.service.kind === 'custom' && (
-                      <option value={CUSTOM_SERVICE_VALUE} className="bg-[#0e0e14] text-white">
-                        {draft.service.label}
-                      </option>
-                    )}
-
-                    <optgroup label="✂️ HAIRCUT SERVICES" className="bg-[#0e0e14] font-bold text-blue-400">
-                      {haircuts.map((service) => (
-                        <option key={service.id} value={service.id} className="text-white">
-                          {service.name} ({formatServicePrice(service)})
-                        </option>
-                      ))}
-                    </optgroup>
-
-                    <optgroup label="🎨 HAIR COLOR" className="bg-[#0e0e14] font-bold text-blue-400">
-                      {colors.map((service) => (
-                        <option key={service.id} value={service.id} className="text-white">
-                          {service.name} ({formatServicePrice(service)})
-                        </option>
-                      ))}
-                    </optgroup>
-
-                    <optgroup label="🌊 PERM & OTHERS" className="bg-[#0e0e14] font-bold text-blue-400">
-                      {others.map((service) => (
-                        <option key={service.id} value={service.id} className="text-white">
-                          {service.name} ({formatServicePrice(service)})
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
-                </div>
-              </div>
-
-              {/* Row 3: Barber & Date */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="booking-barber"
-                    className="text-xs font-bold text-gray-300 uppercase tracking-wider"
-                  >
-                    Pilihan Barber
-                  </label>
-                  <select
-                    id="booking-barber"
-                    value={draft.barberId}
-                    onChange={(e) => setField('barberId', e.target.value)}
-                    className="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
-                  >
-                    <option value="any" className="bg-[#0e0e14]">
-                      Any Master Barber (Siapa saja yang siap)
-                    </option>
-                    {BARBERS_DATA.map((barber) => (
-                      <option key={barber.id} value={String(barber.id)} className="bg-[#0e0e14]">
-                        {barber.name} ({barber.role})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="booking-date"
-                    className="text-xs font-bold text-gray-300 uppercase tracking-wider"
-                  >
-                    Pilih Tanggal
-                  </label>
-                  <div className="relative">
-                    <Calendar size={18} className="absolute left-3.5 top-3.5 text-gray-500" />
-                    <input
-                      id="booking-date"
-                      type="date"
+                      placeholder="Contoh: 081234567890"
                       required
-                      min={today}
-                      value={draft.date}
-                      onChange={(e) => setField('date', e.target.value)}
-                      className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                      className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#1e5eff]"
+                    />
+                  </div>
+                  <span className="text-[10px] text-white/40 block mt-1">
+                    Digunakan untuk pengiriman konfirmasi dan notifikasi jadwal.
+                  </span>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="customer-notes"
+                    className="block text-[11px] text-white/60 mb-1"
+                  >
+                    Catatan Khusus (Opsional)
+                  </label>
+                  <div className="relative">
+                    <MessageSquare className="w-4 h-4 text-white/30 absolute left-3 top-3" />
+                    <textarea
+                      id="customer-notes"
+                      rows={2}
+                      value={draft.notes}
+                      onChange={(e) => setField('notes', e.target.value)}
+                      placeholder="Contoh: Ingin fade tipis samping, bawa anak kecil, dsb."
+                      className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#1e5eff]"
                     />
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Row 4: Time Slot */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="booking-time"
-                  className="text-xs font-bold text-gray-300 uppercase tracking-wider"
-                >
-                  Pilih Jam Kedatangan
-                </label>
-                <div className="relative">
-                  <Clock size={18} className="absolute left-3.5 top-3.5 text-gray-500" />
-                  <select
-                    id="booking-time"
-                    value={draft.time}
-                    onChange={(e) => setField('time', e.target.value)}
-                    className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
-                  >
-                    {TIME_SLOTS.map((time) => (
-                      <option key={time} value={time} className="bg-[#0e0e14]">
-                        {time} WIB
-                      </option>
-                    ))}
-                  </select>
+          {/* ============================================================== */}
+          {/* KOLOM 3: JADWAL, KURSI & TIKET SUBMIT (lg:col-span-3)          */}
+          {/* ============================================================== */}
+          <div className="lg:col-span-3 space-y-5">
+            <div className="bg-[#0c0c14] border border-white/10 rounded-2xl p-5 space-y-5">
+              {/* Date Strip */}
+              <DateStrip
+                selectedDate={draft.date}
+                today={today}
+                onSelectDate={(newDate) => {
+                  setField('date', newDate);
+                  setField('chairId', null);
+                }}
+              />
+
+              {/* Time Slots Grid */}
+              <TimeGrid
+                selectedTime={draft.time}
+                availability={availability}
+                loading={loadingAvailability}
+                onSelectTime={handleTimeSelect}
+              />
+
+              {/* Chair Selector */}
+              <ChairSelector
+                branchId={draft.branchId}
+                selectedChairId={draft.chairId}
+                selectedTime={draft.time}
+                mode={mode}
+                availability={availability}
+                onSelectChair={(chairId) => setField('chairId', chairId)}
+              />
+
+              {/* Availability Error Notice */}
+              {availabilityError && (
+                <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{availabilityError}</span>
+                </div>
+              )}
+
+              {/* Error Feedback */}
+              {submitError && (
+                <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+
+              {/* Booking Summary Box */}
+              <div className="p-3.5 bg-white/[0.03] border border-white/10 rounded-xl space-y-2 text-xs">
+                <div className="flex items-center justify-between text-white/60">
+                  <span>Cabang:</span>
+                  <span className="font-semibold text-white">{selectedBranch.shortName}</span>
+                </div>
+                <div className="flex items-center justify-between text-white/60">
+                  <span>Waktu:</span>
+                  <span className="font-semibold text-white">
+                    {draft.time} WIB ({currentServiceItem?.durationMinutes ?? 45}m)
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-white/60">
+                  <span>Kursi:</span>
+                  <span className="font-semibold text-[#1e5eff]">
+                    {draft.chairId
+                      ? draft.chairId.replace(`${draft.branchId}-chair-`, 'Kursi ')
+                      : mode === 'consultation'
+                      ? 'Konsultasi'
+                      : 'Belum Dipilih'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-white/5 text-sm font-bold text-white">
+                  <span>Estimasi:</span>
+                  <span className="font-mono text-[#1e5eff]">{priceFormatted}</span>
                 </div>
               </div>
 
-              {/* Row 5: Notes */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="booking-notes"
-                  className="text-xs font-bold text-gray-300 uppercase tracking-wider"
-                >
-                  Catatan / Permintaan Khusus (Opsional)
-                </label>
-                <textarea
-                  id="booking-notes"
-                  rows={3}
-                  placeholder="Contoh: Ingin potong fade oleh Kang Yayat di cabang Manislor, konsultasi Korean perm, dll..."
-                  value={draft.notes}
-                  onChange={(e) => setField('notes', e.target.value)}
-                  className="w-full bg-[#050505] border border-white/10 rounded-xl p-4 text-base sm:text-sm text-white focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <motion.button
+              {/* CTA Submit Button */}
+              <button
                 type="submit"
-                whileHover={{ scale: 1.02, boxShadow: '0 0 35px rgba(30,94,255,0.6)' }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full py-4 bg-gradient-to-r from-[#123C8C] via-[#1E5EFF] to-blue-600 hover:from-blue-600 hover:to-indigo-600 text-white font-bold rounded-xl text-xs tracking-[0.2em] shadow-[0_0_25px_rgba(30,94,255,0.4)] transition-all uppercase flex items-center justify-center space-x-2.5 border border-blue-400/40 cursor-pointer"
+                disabled={submitting || (mode === 'chair' && !draft.chairId)}
+                className="w-full py-3.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#1e5eff] hover:bg-[#1a4ecc] text-white flex items-center justify-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#1e5eff]/25 cursor-pointer"
               >
-                <MessageSquare size={18} />
-                <span>KIRIM RESERVASI VIA WHATSAPP</span>
-              </motion.button>
+                {submitting ? (
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>
+                      {mode === 'consultation'
+                        ? 'Kirim Permintaan Konsultasi'
+                        : 'Kunci Kursi & Buat Booking'}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
 
-            </form>
-          </motion.div>
-
-        </div>
+              <p className="text-[10px] text-white/40 text-center leading-relaxed">
+                Slot kursi Anda akan diamankan di database selama 24 jam. Staf kami akan mengirim konfirmasi melalui WhatsApp.
+              </p>
+            </div>
+          </div>
+        </form>
       </div>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {createdBooking && (
+          <BookingSuccessModal
+            booking={createdBooking}
+            onClose={() => setCreatedBooking(null)}
+            onReset={() => {
+              if (onReset) onReset();
+              setField('chairId', null);
+              setCreatedBooking(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
