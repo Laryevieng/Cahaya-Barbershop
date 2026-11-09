@@ -54,41 +54,34 @@ export default function BookingSuccessModal({
       className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
-        className="w-full max-w-xl bg-[#0c0c16] border border-[#1e5eff]/30 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden my-auto"
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="w-full max-w-lg bg-[#181b22] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden my-auto"
       >
-        {/* Glow backdrop */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#1e5eff]/15 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Header Success Icon */}
         <div className="text-center space-y-2 mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
-            <CheckCircle2 className="w-8 h-8" />
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
+            <CheckCircle2 className="w-7 h-7" />
           </div>
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            Reservasi Berhasil Dicatat
-          </span>
-          <h2 className="text-2xl font-bold tracking-tight text-white">
+          <h2 className="text-2xl font-serif font-bold tracking-tight text-[#f1f1ed]">
             Slot Kursi Anda Telah Dikunci
           </h2>
-          <p className="text-xs text-white/60 max-w-md mx-auto leading-relaxed">
-            Booking tersimpan di sistem kami dengan status <strong className="text-amber-300">Menunggu Konfirmasi</strong>. Segera kirim kode ke WhatsApp agar staf kami mengonfirmasi jadwal Anda.
+          <p className="text-xs text-[#9ca3af] max-w-sm mx-auto leading-relaxed">
+            Booking tersimpan di sistem dengan status <strong className="text-amber-300">Menunggu Konfirmasi</strong>. Kirim rincian jadwal ke WhatsApp agar staf kami memverifikasi pesanan Anda.
           </p>
         </div>
 
-        {/* Booking Code Card */}
-        <div className="p-4 bg-white/5 border border-white/10 rounded-2xl mb-6 text-center space-y-2">
-          <span className="text-[11px] font-medium text-white/50 uppercase tracking-wider">
+        <div className="p-4 bg-[#0f1115] border border-white/10 rounded-xl mb-6 text-center space-y-2">
+          <span className="text-[11px] font-medium text-[#9ca3af] uppercase tracking-wider">
             Kode Booking Resmi
           </span>
           <div className="flex items-center justify-center gap-2">
-            <span className="text-2xl font-mono font-black tracking-widest text-[#1e5eff]">
+            <span className="text-2xl font-mono font-bold tracking-widest text-[#c89b3c]">
               {booking.code}
             </span>
             <button
+              type="button"
               onClick={handleCopyCode}
               title="Salin kode booking"
               className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition cursor-pointer"
@@ -108,37 +101,36 @@ export default function BookingSuccessModal({
           </p>
         </div>
 
-        {/* Booking Details Grid */}
-        <div className="bg-[#08080e] border border-white/5 rounded-2xl p-4 mb-6 space-y-2.5 text-xs">
+        <div className="bg-[#0f1115] border border-white/5 rounded-xl p-4 mb-6 space-y-2.5 text-xs">
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
-            <span className="text-white/50 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-[#1e5eff]" />
+            <span className="text-[#9ca3af] flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-[#c89b3c]" />
               Nama Pemesan
             </span>
             <span className="font-semibold text-white">{booking.customer_name}</span>
           </div>
 
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
-            <span className="text-white/50 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-[#1e5eff]" />
+            <span className="text-[#9ca3af] flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-[#c89b3c]" />
               Cabang
             </span>
             <span className="font-semibold text-white">{branchLabel}</span>
           </div>
 
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
-            <span className="text-white/50 flex items-center gap-1.5">
-              <Armchair className="w-3.5 h-3.5 text-[#1e5eff]" />
+            <span className="text-[#9ca3af] flex items-center gap-1.5">
+              <Armchair className="w-3.5 h-3.5 text-[#c89b3c]" />
               Kursi
             </span>
-            <span className="font-semibold text-[#1e5eff]">
-              {booking.chair_label || (booking.booking_mode === 'consultation' ? 'Konsultasi Event' : 'Kursi')}
+            <span className="font-semibold text-[#c89b3c]">
+              {booking.chair_label || (booking.booking_mode === 'consultation' ? 'Konsultasi Acara' : 'Kursi')}
             </span>
           </div>
 
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
-            <span className="text-white/50 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-[#1e5eff]" />
+            <span className="text-[#9ca3af] flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-[#c89b3c]" />
               Jadwal & Waktu
             </span>
             <span className="font-semibold text-white">
@@ -148,42 +140,42 @@ export default function BookingSuccessModal({
           </div>
 
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
-            <span className="text-white/50 flex items-center gap-1.5">
-              <Scissors className="w-3.5 h-3.5 text-[#1e5eff]" />
+            <span className="text-[#9ca3af] flex items-center gap-1.5">
+              <Scissors className="w-3.5 h-3.5 text-[#c89b3c]" />
               Layanan & Barber
             </span>
             <span className="font-semibold text-white text-right">
-              {booking.service_name} · <span className="text-white/70">{booking.barber_name || 'Any Barber'}</span>
+              {booking.service_name} · <span className="text-[#9ca3af]">{booking.barber_name || 'Any'}</span>
             </span>
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-white/50">Estimasi Biaya</span>
+            <span className="text-[#9ca3af]">Estimasi Biaya</span>
             <span className="font-mono font-bold text-white text-sm">
               {formatRupiah(booking.price_idr)}
             </span>
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="space-y-2.5">
           <a
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-600/25 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl font-bold text-xs bg-[#c89b3c] hover:bg-[#b5892f] text-[#0f1115] flex items-center justify-center gap-2 transition cursor-pointer shadow-md shadow-[#c89b3c]/20 uppercase tracking-wider"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>Kirim Konfirmasi ke WhatsApp Sekarang</span>
+            <span>Kirim Konfirmasi ke WhatsApp</span>
             <ArrowRight className="w-4 h-4" />
           </a>
 
           <button
+            type="button"
             onClick={() => {
               onReset();
               onClose();
             }}
-            className="w-full py-3 px-4 rounded-xl font-medium text-xs text-white/60 hover:text-white bg-white/5 hover:bg-white/10 transition cursor-pointer"
+            className="w-full py-2.5 px-4 rounded-xl font-medium text-xs text-[#9ca3af] hover:text-white bg-white/5 hover:bg-white/10 transition cursor-pointer"
           >
             Selesai & Buat Reservasi Lain
           </button>

@@ -51,7 +51,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#050505] text-[#EDEDED] relative overflow-x-hidden selection:bg-[#1E5EFF] selection:text-white">
+    <main className="min-h-screen bg-[#0f1115] text-[#f1f1ed] relative overflow-x-hidden selection:bg-[#c89b3c] selection:text-[#0f1115]">
       {/* Header Navigation */}
       <Navbar onNavigate={scrollToSection} />
 

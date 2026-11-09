@@ -1,10 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050505;
-  --foreground: #ededed;
-  --color-primary: #1e5eff;
-  --color-primary-dark: #123c8c;
+  --background: #0f1115;
+  --surface: #181b22;
+  --surface-raised: #1f232c;
+  --foreground: #f1f1ed;
+  --foreground-muted: #9ca3af;
+  --color-primary: #c89b3c;
+  --color-primary-hover: #b5892f;
+  --color-primary-dark: #8c671f;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: #c89b3c;
 }
 
 @theme inline {
@@ -20,8 +26,8 @@ html {
 }
 
 body {
-  background-color: #050505;
-  color: #ededed;
+  background-color: var(--background);
+  color: var(--foreground);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
@@ -35,42 +41,28 @@ img {
   -webkit-user-drag: none;
 }
 
-/* Custom modern scrollbar */
+/* Accessible focus visible ring across interactive elements */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Custom quiet scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #070709;
+  background: #0f1115;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #232731;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #1e5eff;
-}
-
-/* Text glow & subtle luxury shadows */
-.text-glow {
-  text-shadow: 0 0 25px rgba(30, 94, 255, 0.55);
-}
-
-.box-glow {
-  box-shadow: 0 0 35px -5px rgba(30, 94, 255, 0.3);
-}
-
-.box-glow-gold {
-  box-shadow: 0 0 35px -5px rgba(234, 179, 8, 0.2);
-}
-
-/* Gradient text utility */
-.gradient-text-blue {
-  background: linear-gradient(135deg, #ffffff 20%, #93c5fd 60%, #1e5eff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: #c89b3c;
 }
 
 /* Hide scrollbar for touch carousels */

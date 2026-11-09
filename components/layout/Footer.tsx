@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MessageSquare, ExternalLink } from 'lucide-react';
+import { MessageSquare, MapPin } from 'lucide-react';
 import { InstagramIcon } from '@/components/ui/Icons';
 import { SHOP_INFO, BRANCHES_DATA } from '@/data';
 
@@ -11,33 +11,30 @@ interface FooterProps {
 
 export default function Footer({ onNavigate }: FooterProps) {
   return (
-    <footer className="bg-[#030305] text-gray-400 border-t border-white/10 pt-20 pb-12 relative overflow-hidden">
+    <footer className="bg-[#0f1115] text-[#9ca3af] border-t border-white/10 pt-16 pb-12 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-14 border-b border-white/10">
-          
-          {/* Brand Info */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-white/10">
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center space-x-3.5">
-              <div className="relative w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-blue-600 via-indigo-500 to-blue-400 shadow-[0_0_20px_rgba(30,94,255,0.4)] shrink-0">
+              <div className="relative w-11 h-11 rounded-full p-[2px] bg-[#c89b3c]/20 border border-[#c89b3c]/40 shrink-0">
                 <img
                   src="/images/logo.png"
-                  alt="CAHAYA BARBERSHOP Logo"
+                  alt="Logo Cahaya Barbershop"
                   className="w-full h-full object-cover rounded-full bg-black"
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif text-2xl font-black text-white tracking-wider leading-none">
+                <span className="font-serif text-2xl font-bold text-[#f1f1ed] tracking-wider leading-none">
                   CAHAYA
                 </span>
-                <span className="text-[9px] tracking-[0.3em] text-blue-400 font-bold uppercase mt-1">
+                <span className="text-[9px] tracking-[0.25em] text-[#c89b3c] font-bold uppercase mt-1">
                   BARBERSHOP
                 </span>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-gray-400 max-w-sm leading-relaxed font-light">
-              Your Style. Our Craft. Layanan grooming pria presisi, pewarnaan modern, dan kenyamanan potong rambut terbaik di Kuningan dengan 3 cabang resmi.
+            <p className="text-xs sm:text-sm text-[#9ca3af] max-w-sm leading-relaxed font-normal">
+              Layanan grooming pria dengan potongan rambut presisi, perming modern, dan kenyamanan terbaik di Kuningan dengan 3 cabang resmi.
             </p>
 
             <div className="pt-2 flex items-center space-x-3 text-white">
@@ -45,82 +42,79 @@ export default function Footer({ onNavigate }: FooterProps) {
                 href="https://instagram.com/cahayabarbershop"
                 target="_blank"
                 rel="noreferrer"
-                className="p-3 rounded-xl bg-white/5 hover:bg-blue-600 transition-colors border border-white/5 flex items-center space-x-2 text-xs font-semibold"
+                className="px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/10 flex items-center space-x-2 text-xs font-medium cursor-pointer"
                 aria-label="Instagram Cahaya Barbershop"
               >
-                <InstagramIcon size={18} className="text-pink-400" />
+                <InstagramIcon size={16} />
                 <span>@cahayabarbershop</span>
               </a>
               <a
                 href={`https://wa.me/${SHOP_INFO.whatsapp}`}
                 target="_blank"
                 rel="noreferrer"
-                className="p-3 rounded-xl bg-white/5 hover:bg-emerald-600 transition-colors border border-white/5"
+                className="p-2.5 rounded-xl bg-white/5 hover:bg-[#c89b3c] hover:text-[#0f1115] text-white transition-colors border border-white/10 cursor-pointer"
                 aria-label="WhatsApp"
               >
-                <MessageSquare size={18} />
+                <MessageSquare size={16} />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
           <div className="md:col-span-3 space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-widest">
-              Navigasi Cepat
+            <h4 className="text-xs font-bold text-[#f1f1ed] uppercase tracking-wider">
+              Navigasi Halaman
             </h4>
-            <ul className="space-y-2.5 text-xs">
+            <ul className="space-y-2 text-xs">
               <li>
                 <button
+                  type="button"
                   onClick={() => onNavigate('home')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-white transition-colors cursor-pointer"
                 >
-                  Home & Profil
+                  Beranda
                 </button>
               </li>
               <li>
                 <button
+                  type="button"
                   onClick={() => onNavigate('about')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-white transition-colors cursor-pointer"
                 >
                   Tentang Kami
                 </button>
               </li>
               <li>
                 <button
+                  type="button"
                   onClick={() => onNavigate('services')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-white transition-colors cursor-pointer"
                 >
-                  Layanan & Pricelist
+                  Layanan & Tarif
                 </button>
               </li>
               <li>
                 <button
+                  type="button"
                   onClick={() => onNavigate('pricing')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-white transition-colors cursor-pointer"
                 >
                   Paket Pilihan
                 </button>
               </li>
               <li>
                 <button
+                  type="button"
                   onClick={() => onNavigate('barbers')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-white transition-colors cursor-pointer"
                 >
-                  Master Barber & Tim
+                  Master Barber
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('contact')}
-                  className="hover:text-blue-400 transition-colors"
-                >
-                  Lokasi 3 Cabang
-                </button>
-              </li>
-              <li>
-                <button
+                  type="button"
                   onClick={() => onNavigate('booking')}
-                  className="hover:text-blue-400 transition-colors text-blue-400 font-semibold"
+                  className="text-[#c89b3c] font-semibold hover:underline cursor-pointer"
                 >
                   Reservasi Jadwal
                 </button>
@@ -128,53 +122,42 @@ export default function Footer({ onNavigate }: FooterProps) {
             </ul>
           </div>
 
-          {/* Opening Hours & 3 Branches */}
           <div className="md:col-span-4 space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-widest">
+            <h4 className="text-xs font-bold text-[#f1f1ed] uppercase tracking-wider">
               Lokasi 3 Cabang & Jam Buka
             </h4>
-            <p className="text-xs text-blue-400 font-semibold">
-              ⏰ {SHOP_INFO.hours.weekdays} (Buka Setiap Hari)
+            <p className="text-xs text-[#c89b3c] font-medium">
+              {SHOP_INFO.hours.weekdays} (Buka Setiap Hari)
             </p>
 
-            <ul className="space-y-2 pt-1 text-xs text-gray-300">
+            <ul className="space-y-2.5 pt-1 text-xs">
               {BRANCHES_DATA.map((b) => (
-                <li key={b.id} className="flex items-start justify-between gap-2 border-b border-white/5 pb-1.5">
+                <li key={b.id} className="flex items-start justify-between gap-2 border-b border-white/5 pb-2">
                   <div>
-                    <span className="font-bold text-white block">📍 {b.name}</span>
-                    <span className="text-[11px] text-gray-400 block">{b.address}</span>
+                    <span className="font-semibold text-white block">{b.name}</span>
+                    <span className="text-[11px] text-[#9ca3af] block">{b.address}</span>
                   </div>
                   <a
                     href={b.mapUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-white shrink-0 flex items-center space-x-1 text-[11px] font-bold bg-white/5 px-2 py-1 rounded"
+                    className="text-[#c89b3c] hover:text-white shrink-0 flex items-center space-x-1 text-[11px] font-medium bg-white/5 px-2 py-1 rounded-md border border-white/5 cursor-pointer"
                   >
-                    <span>Maps</span>
-                    <ExternalLink size={11} />
+                    <MapPin size={11} />
+                    <span>Peta</span>
                   </a>
                 </li>
               ))}
             </ul>
-
-            <div className="pt-2">
-              <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-[10px] font-bold text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>OPEN DAILY FOR WALK-IN & BOOKING</span>
-              </span>
-            </div>
           </div>
-
         </div>
 
-        {/* Bottom copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-4">
-          <p>© 2026 CAHAYA BARBERSHOP. All rights reserved.</p>
-          <p className="text-[11px] flex items-center space-x-1">
-            <span>Instagram: @cahayabarbershop</span>
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#9ca3af] gap-4">
+          <p>© 2026 Cahaya Barbershop Kuningan. Hak cipta dilindungi.</p>
+          <p className="text-[11px]">
+            Manislor · Jagabaya · Jalaksana
           </p>
         </div>
-
       </div>
     </footer>
   );

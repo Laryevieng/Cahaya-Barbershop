@@ -8,11 +8,10 @@ import { REVIEWS_DATA } from '@/data';
 export default function ReviewsSection() {
   const [activeIdx, setActiveIdx] = useState(0);
 
-  // Auto slide every 6 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveIdx((prev) => (prev === REVIEWS_DATA.length - 1 ? 0 : prev + 1));
-    }, 6000);
+    }, 7000);
     return () => clearInterval(timer);
   }, []);
 
@@ -27,75 +26,65 @@ export default function ReviewsSection() {
   const activeReview = REVIEWS_DATA[activeIdx];
 
   return (
-    <section className="py-28 bg-[#0a0a0d] border-t border-b border-white/5 relative overflow-hidden">
-      {/* Background Accent */}
-      <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Header */}
+    <section className="py-24 bg-[#0f1115] border-t border-b border-white/5 relative overflow-hidden">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center space-y-4 mb-16"
+          transition={{ duration: 0.5 }}
+          className="text-center space-y-3 mb-12"
         >
-          <span className="inline-block text-xs font-bold tracking-[0.3em] text-blue-400 uppercase">
-            CLIENT SATISFACTION
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-serif font-bold text-white">
-            What Our Clients Say
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#f1f1ed]">
+            Pengalaman Pelanggan
           </h2>
+          <p className="text-[#9ca3af] text-sm">
+            Pendapat jujur para pelanggan setia di tiga cabang Cahaya Barbershop Kuningan.
+          </p>
         </motion.div>
 
-        {/* Testimonial Card */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative bg-[#0d0d14] rounded-3xl p-8 sm:p-14 border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.8)]"
+          transition={{ duration: 0.5 }}
+          className="relative bg-[#181b22] rounded-2xl p-7 sm:p-12 border border-white/10 shadow-xl"
         >
-          {/* Decorative Quote Icon */}
-          <div className="absolute top-8 right-8 text-white/5 pointer-events-none">
-            <Quote size={80} />
+          <div className="absolute top-6 right-6 text-white/5 pointer-events-none">
+            <Quote size={64} />
           </div>
 
-          <div className="min-h-[220px] flex flex-col items-center justify-center text-center">
+          <div className="min-h-[200px] flex flex-col items-center justify-center text-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeReview.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-6 flex flex-col items-center"
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-5 flex flex-col items-center"
               >
-                {/* 5-star rating */}
-                <div className="flex space-x-1.5 text-amber-400">
+                <div className="flex space-x-1 text-[#c89b3c]">
                   {[...Array(activeReview.rating)].map((_, i) => (
-                    <Star key={i} size={20} fill="currentColor" />
+                    <Star key={i} size={18} fill="currentColor" />
                   ))}
                 </div>
 
-                {/* Review Text */}
-                <p className="text-lg sm:text-2xl font-serif italic text-gray-200 max-w-2xl leading-relaxed">
-                  &#34;{activeReview.review}&#34;
+                <p className="text-base sm:text-xl font-serif text-[#f1f1ed] max-w-2xl leading-relaxed">
+                  &ldquo;{activeReview.review}&rdquo;
                 </p>
 
-                {/* Client Avatar & Meta */}
-                <div className="flex items-center space-x-4 pt-4">
-                  <img
-                    src={activeReview.avatar}
-                    alt={activeReview.name}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-blue-500 shadow-md"
-                  />
+                <div className="flex items-center space-x-3.5 pt-2">
+                  <div className="w-12 h-12 rounded-full bg-[#1f232c] border border-white/10 flex items-center justify-center text-sm font-bold text-[#c89b3c] shrink-0">
+                    {activeReview.avatar}
+                  </div>
                   <div className="text-left">
-                    <h4 className="font-bold text-white text-base font-serif">{activeReview.name}</h4>
-                    <p className="text-xs text-blue-400 font-medium">{activeReview.role}</p>
+                    <h4 className="font-bold text-[#f1f1ed] text-sm">
+                      {activeReview.name}
+                    </h4>
+                    <p className="text-xs text-[#9ca3af]">{activeReview.role}</p>
                     {activeReview.service && (
-                      <p className="text-[11px] text-gray-400">{activeReview.service}</p>
+                      <p className="text-[11px] text-[#c89b3c]">{activeReview.service}</p>
                     )}
                   </div>
                 </div>
@@ -103,45 +92,42 @@ export default function ReviewsSection() {
             </AnimatePresence>
           </div>
 
-          {/* Slider Controls */}
-          <div className="flex justify-between items-center mt-10 pt-6 border-t border-white/10">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+          <div className="flex justify-between items-center mt-8 pt-5 border-t border-white/10">
+            <button
+              type="button"
               onClick={handlePrev}
-              className="p-3 rounded-full bg-white/5 hover:bg-white/15 text-white transition-colors border border-white/5"
-              aria-label="Previous Testimonial"
+              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/5 cursor-pointer"
+              aria-label="Ulasan sebelumnya"
             >
-              <ChevronLeft size={20} />
-            </motion.button>
+              <ChevronLeft size={18} />
+            </button>
 
-            {/* Indicator Dots */}
             <div className="flex space-x-2">
               {REVIEWS_DATA.map((_, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => setActiveIdx(idx)}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    activeIdx === idx ? 'bg-blue-500 w-8' : 'bg-white/20 w-2.5 hover:bg-white/40'
+                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                    activeIdx === idx
+                      ? 'w-6 bg-[#c89b3c]'
+                      : 'w-2 bg-white/20 hover:bg-white/40'
                   }`}
-                  aria-label={`Go to slide ${idx + 1}`}
+                  aria-label={`Lihat ulasan ${idx + 1}`}
                 />
               ))}
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <button
+              type="button"
               onClick={handleNext}
-              className="p-3 rounded-full bg-white/5 hover:bg-white/15 text-white transition-colors border border-white/5"
-              aria-label="Next Testimonial"
+              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/5 cursor-pointer"
+              aria-label="Ulasan selanjutnya"
             >
-              <ChevronRight size={20} />
-            </motion.button>
+              <ChevronRight size={18} />
+            </button>
           </div>
-
         </motion.div>
-
       </div>
     </section>
   );

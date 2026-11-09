@@ -1,9 +1,9 @@
 export const SHOP_INFO = {
   name: 'CAHAYA BARBERSHOP',
   city: 'KUNINGAN',
-  tagline: 'Look Sharp. Feel Confident.',
+  tagline: 'Potongan Rapi Presisi. Karakter Wajah Tepat.',
   description:
-    'Pengalaman grooming & styling pria premium di Kuningan dengan 3 cabang strategis (Manislor, Jagabaya, Jalaksana). Precision haircut, hair color, korean perm, hingga cukur panggilan & hairdo wedding.',
+    'Layanan pangkas rambut pria di Kuningan dengan 3 cabang strategis (Manislor, Jagabaya, Jalaksana). Menghadirkan teknik pangkas presisi, konsultasi bentuk wajah, cuci rambut segar, hingga Korean Perm.',
   phone: '+62 852-2123-9852',
   whatsapp: '6285221239852',
   logo: '/images/logo.png',
@@ -15,8 +15,8 @@ export const SHOP_INFO = {
   },
   stats: [
     { value: '3 Cabang', label: 'Lokasi Strategis', detail: 'Manislor, Jagabaya, Jalaksana' },
-    { value: '5.0 ★', label: 'Google Rating', detail: 'Based on 500+ reviews' },
-    { value: '1,500+', label: 'Happy Clients', detail: 'Pelanggan Setia' },
+    { value: '5.0 ★', label: 'Google Rating', detail: 'Berdasarkan 500+ ulasan' },
+    { value: '1.500+', label: 'Pelanggan Setia', detail: 'Kunjungan rutin' },
     { value: '100%', label: 'Kepuasan', detail: 'Garansi Hasil Rapi' },
   ],
 };

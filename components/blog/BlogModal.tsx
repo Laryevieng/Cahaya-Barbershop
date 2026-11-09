@@ -3,14 +3,14 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, User } from 'lucide-react';
-import { BlogPost } from '@/types/barbershop';
+import type { BlogPost } from '@/types/barbershop';
 
 interface BlogModalProps {
-  post: BlogPost | null;
+  article: BlogPost | null;
   onClose: () => void;
 }
 
-export default function BlogModal({ post, onClose }: BlogModalProps) {
+export default function BlogModal({ article, onClose }: BlogModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -19,88 +19,82 @@ export default function BlogModal({ post, onClose }: BlogModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  if (!post) return null;
+  if (!article) return null;
 
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-        {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-black/90 backdrop-blur-md"
+          className="fixed inset-0 bg-black/85 backdrop-blur-md"
         />
 
-        {/* Modal Content */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.96, y: 14 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="relative max-w-2xl w-full bg-[#0d0d14] border border-white/15 rounded-3xl overflow-hidden p-6 sm:p-9 space-y-6 max-h-[85vh] overflow-y-auto shadow-[0_25px_70px_rgba(0,0,0,0.9)] z-10 my-auto"
+          exit={{ opacity: 0, scale: 0.96, y: 14 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="relative max-w-2xl w-full bg-[#181b22] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl z-10 space-y-6 my-auto"
         >
-          {/* Close Button */}
           <button
+            type="button"
             onClick={onClose}
-            className="absolute top-5 right-5 z-20 p-2.5 bg-black/70 rounded-full text-white hover:bg-white/20 transition-colors border border-white/10"
-            aria-label="Close Article"
+            className="absolute top-4 right-4 p-2 bg-[#0f1115] rounded-full text-white hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
+            aria-label="Tutup artikel"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
 
-          {/* Category & Date */}
-          <div className="flex items-center space-x-3 text-xs text-blue-400 font-bold uppercase tracking-wider">
-            <span className="px-3 py-1 rounded-full bg-blue-600/20 border border-blue-500/30">
-              {post.category}
+          <div className="flex items-center space-x-3 text-xs text-[#c89b3c] font-semibold uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-md bg-[#c89b3c]/15 border border-[#c89b3c]/30">
+              {article.category}
             </span>
-            <span className="text-gray-400 flex items-center space-x-1">
+            <span className="text-[#9ca3af] flex items-center space-x-1">
               <Calendar size={13} />
-              <span>{post.date}</span>
+              <span>{article.date}</span>
             </span>
-            {post.readTime && (
-              <span className="text-gray-400 flex items-center space-x-1">
+            {article.readTime && (
+              <span className="text-[#9ca3af] flex items-center space-x-1">
                 <Clock size={13} />
-                <span>{post.readTime}</span>
+                <span>{article.readTime}</span>
               </span>
             )}
           </div>
 
-          {/* Title */}
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white leading-snug">
-            {post.title}
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#f1f1ed] leading-snug">
+            {article.title}
           </h2>
 
-          {/* Banner Image */}
-          <div className="rounded-2xl overflow-hidden border border-white/10">
+          <div className="rounded-xl overflow-hidden border border-white/10">
             <img
-              src={post.image}
-              alt={post.title}
-              className="w-full h-64 sm:h-72 object-cover"
+              src={article.image}
+              alt={article.title}
+              className="w-full h-56 sm:h-64 object-cover"
             />
           </div>
 
-          {/* Article Body */}
-          <div className="space-y-4 text-gray-300 text-sm sm:text-base leading-relaxed font-light">
-            <p className="text-white font-medium text-base sm:text-lg italic border-l-2 border-blue-500 pl-4 py-1">
-              {post.excerpt}
+          <div className="space-y-4 text-[#d1d5db] text-sm sm:text-base leading-relaxed font-normal">
+            <p className="text-white font-medium italic border-l-2 border-[#c89b3c] pl-4 py-1">
+              {article.excerpt}
             </p>
-            <p>{post.content}</p>
+            <p>{article.content}</p>
           </div>
 
-          {/* Footer Metadata */}
-          <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="flex items-center space-x-2 text-xs text-gray-400">
-              <User size={14} className="text-blue-400" />
-              <span>By CAHAYA BARBERSHOP Editorial & Master Craftsmen</span>
+          <div className="pt-5 border-t border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center space-x-2 text-xs text-[#9ca3af]">
+              <User size={13} className="text-[#c89b3c]" />
+              <span>Tim Barbershop Kuningan</span>
             </div>
 
             <button
+              type="button"
               onClick={onClose}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition-colors"
+              className="px-5 py-2.5 bg-[#c89b3c] hover:bg-[#b5892f] text-[#0f1115] rounded-xl font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
             >
-              CLOSE ARTICLE
+              Tutup Artikel
             </button>
           </div>
         </motion.div>

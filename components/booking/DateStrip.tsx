@@ -20,7 +20,6 @@ export default function DateStrip({
     []
   );
 
-  // Generate all days in the current month
   const allMonthDays = useMemo(() => {
     return Array.from({ length: daysInMonth }, (_, i) => {
       const dayNum = i + 1;
@@ -43,7 +42,6 @@ export default function DateStrip({
     });
   }, [year, month, monthISO, daysInMonth, today]);
 
-  // Track user manual window navigation; if null, derive window from selectedDate
   const [manualWindow, setManualWindow] = useState<number | null>(null);
 
   const windowStart = useMemo(() => {
@@ -74,15 +72,14 @@ export default function DateStrip({
 
   return (
     <div className="space-y-2.5">
-      {/* Month Header & Navigation */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <CalendarIcon className="w-4 h-4 text-[#1e5eff]" />
+          <CalendarIcon className="w-4 h-4 text-[#c89b3c]" />
           <span className="text-xs font-bold text-white capitalize">
             {monthLabel}
           </span>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#1e5eff]/15 text-[#1e5eff] border border-[#1e5eff]/25">
-            Bulan Ini Saja
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#c89b3c]/10 text-[#c89b3c] border border-[#c89b3c]/20">
+            Bulan Ini
           </span>
         </div>
 
@@ -92,7 +89,7 @@ export default function DateStrip({
             onClick={handlePrev}
             disabled={!canGoPrev}
             title="Minggu sebelumnya"
-            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
+            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed border border-white/10 flex items-center justify-center text-[#d1d5db] hover:text-white transition cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -101,14 +98,13 @@ export default function DateStrip({
             onClick={handleNext}
             disabled={!canGoNext}
             title="Minggu berikutnya"
-            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
+            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed border border-white/10 flex items-center justify-center text-[#d1d5db] hover:text-white transition cursor-pointer"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* 7 Visible Days Strip */}
       <div className="grid grid-cols-7 gap-1.5">
         {visibleDays.map((d) => {
           const isSelected = selectedDate === d.dateISO;
@@ -122,15 +118,15 @@ export default function DateStrip({
               aria-pressed={isSelected}
               className={`py-2 px-1 rounded-xl text-center border transition flex flex-col items-center justify-between relative cursor-pointer ${
                 isSelected
-                  ? 'bg-[#1e5eff] border-[#1e5eff] text-white shadow-lg shadow-[#1e5eff]/30'
+                  ? 'bg-[#c89b3c] border-[#c89b3c] text-[#0f1115] font-bold shadow-md shadow-[#c89b3c]/20'
                   : d.isPast
-                  ? 'bg-white/[0.01] border-white/5 text-white/20 cursor-not-allowed opacity-40'
-                  : 'bg-white/[0.03] border-white/10 text-white/70 hover:border-white/30 hover:text-white hover:bg-white/[0.06]'
+                  ? 'bg-white/[0.01] border-white/5 text-white/20 cursor-not-allowed opacity-30'
+                  : 'bg-white/[0.02] border-white/10 text-white/70 hover:border-white/20 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               <span
                 className={`text-[9px] font-bold tracking-wider ${
-                  isSelected ? 'text-white/90' : d.isPast ? 'text-white/20' : 'text-white/50'
+                  isSelected ? 'text-[#0f1115]' : d.isPast ? 'text-white/20' : 'text-[#9ca3af]'
                 }`}
               >
                 {d.dayName}
@@ -138,7 +134,7 @@ export default function DateStrip({
 
               <span
                 className={`text-sm sm:text-base font-bold my-0.5 ${
-                  isSelected ? 'text-white' : ''
+                  isSelected ? 'text-[#0f1115]' : ''
                 }`}
               >
                 {d.dayNum}
@@ -146,10 +142,10 @@ export default function DateStrip({
 
               {d.isToday ? (
                 <span
-                  className={`text-[8px] font-bold px-1 rounded-full ${
+                  className={`text-[8px] font-bold px-1 rounded ${
                     isSelected
-                      ? 'bg-white text-[#1e5eff]'
-                      : 'bg-[#1e5eff]/20 text-[#1e5eff]'
+                      ? 'bg-[#0f1115] text-[#c89b3c]'
+                      : 'bg-[#c89b3c]/20 text-[#c89b3c]'
                   }`}
                 >
                   Hari ini

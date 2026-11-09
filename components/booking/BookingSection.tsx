@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   ShieldCheck,
   AlertCircle,
-  Armchair,
   ArrowRight,
   MapPin,
 } from 'lucide-react';
@@ -43,12 +42,10 @@ export default function BookingSection({
   setField,
   onReset,
 }: BookingSectionProps) {
-  // Availability state
   const [availability, setAvailability] = useState<AvailabilityResponse | null>(null);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [availabilityError, setAvailabilityError] = useState<string | null>(null);
 
-  // Form submission state
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [createdBooking, setCreatedBooking] = useState<PublicBooking | null>(null);
@@ -69,7 +66,6 @@ export default function BookingSection({
     return currentServiceItem?.bookingMode ?? 'chair';
   }, [draft.service, currentServiceItem]);
 
-  // Keep stable refs for slot auto-adjustment without triggering re-fetch
   const currentSlotSelectionRef = useRef({ time: draft.time, chairId: draft.chairId });
   useEffect(() => {
     currentSlotSelectionRef.current = { time: draft.time, chairId: draft.chairId };
@@ -80,7 +76,6 @@ export default function BookingSection({
     setFieldRef.current = setField;
   }, [setField]);
 
-  // Fetch live availability whenever branch, date, service, or barber changes
   useEffect(() => {
     let ignore = false;
     const controller = new AbortController();
@@ -103,7 +98,7 @@ export default function BookingSection({
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error || 'Gagal memuat ketersediaan');
+          throw new Error(errData.error || 'Gagal memuat ketersediaan jadwal');
         }
 
         const data: AvailabilityResponse = await res.json();
@@ -112,7 +107,6 @@ export default function BookingSection({
 
           const { time, chairId } = currentSlotSelectionRef.current;
 
-          // Check if currently selected time is valid
           const currentSlot = data.slots.find((s) => s.time === time);
           if (!currentSlot?.available) {
             const firstAvailable = data.slots.find((s) => s.available);
@@ -121,7 +115,6 @@ export default function BookingSection({
             }
           }
 
-          // If current chair is occupied at this time, reset chair selection
           if (chairId && currentSlot) {
             const chairStatus = currentSlot.chairs.find((c) => c.id === chairId);
             if (!chairStatus?.available) {
@@ -148,36 +141,30 @@ export default function BookingSection({
     };
   }, [draft.branchId, draft.date, selectedServiceId, draft.barberId]);
 
-  // Handle branch change: clear chair
   const handleBranchSelect = (branchId: string) => {
     setField('branchId', branchId);
     setField('chairId', null);
   };
 
-  // Handle service change: clear chair
   const handleServiceSelect = (selection: BookingDraft['service']) => {
     setField('service', selection);
     setField('chairId', null);
   };
 
-  // Handle barber change: clear chair
   const handleBarberSelect = (barberId: string) => {
     setField('barberId', barberId);
     setField('chairId', null);
   };
 
-  // Handle time change: clear chair
   const handleTimeSelect = (time: string) => {
     setField('time', time);
     setField('chairId', null);
   };
 
-  // Handle form submission
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
 
-    // Basic frontend checks
     if (!draft.name.trim()) {
       setSubmitError('Nama pemesan harus diisi.');
       return;
@@ -247,51 +234,37 @@ export default function BookingSection({
   return (
     <section
       id="booking"
-      className="py-20 sm:py-24 bg-[#050505] text-[#ededed] relative overflow-hidden"
+      className="py-24 bg-[#0f1115] text-[#f1f1ed] relative overflow-hidden"
     >
-      {/* Background Ambience */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[#1e5eff]/10 rounded-full blur-[140px] pointer-events-none" />
-
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-[#1e5eff]/10 border border-[#1e5eff]/30 text-[#1e5eff]">
-            <Armchair className="w-3.5 h-3.5" />
-            <span>Booking Online · 3 Cabang · 3 Kursi Per Cabang</span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white font-serif">
-            Pilih Kursi,{' '}
-            <span className="text-[#1e5eff] italic">Amankan Jadwal.</span>
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#f1f1ed] font-serif">
+            Reservasi Kursi & Jadwal Cukur
           </h2>
 
-          <p className="text-xs sm:text-sm text-white/60 leading-relaxed">
-            Sistem reservasi real-time Cahaya Barbershop. Setiap cabang memiliki 3 kursi khusus. Pilih cabang, layanan, dan barber pilihan Anda, lalu kunci kursi dan jam kunjungan. Slot otomatis kedaluwarsa setelah 24 jam bila belum dikonfirmasi.
+          <p className="text-xs sm:text-sm text-[#9ca3af] leading-relaxed">
+            Sistem ketersediaan real-time untuk 3 cabang di Kuningan. Pilih cabang, layanan, kapster, dan kursi yang Anda kehendaki. Kursi yang dipilih akan diamankan langsung di sistem selama 24 jam.
           </p>
         </div>
 
-        {/* 3-Column Layout Grid */}
         <form
           onSubmit={handleSubmitBooking}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"
         >
-          {/* ============================================================== */}
-          {/* KOLOM 1: INFO, PILIH CABANG & LANGKAH OPERASIONAL (lg:col-span-4) */}
-          {/* ============================================================== */}
+          {/* Kolom 1: Pilih Cabang & Ketentuan */}
           <div className="lg:col-span-4 space-y-5">
-            {/* Cabang Selector Card */}
-            <div className="bg-[#0c0c14] border border-white/10 rounded-2xl p-5 space-y-4">
+            <div className="bg-[#181b22] border border-white/10 rounded-2xl p-5 space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-white/70 block flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-[#1e5eff]" />
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#d1d5db] block flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-[#c89b3c]" />
                   <span>Pilih Cabang Barbershop</span>
                 </label>
-                <span className="text-[11px] text-white/40">
+                <span className="text-[11px] text-[#9ca3af]">
                   3 lokasi strategis di Kabupaten Kuningan
                 </span>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {BRANCHES_DATA.map((branch) => {
                   const isSelected = draft.branchId === branch.id;
 
@@ -302,7 +275,7 @@ export default function BookingSection({
                       onClick={() => handleBranchSelect(branch.id)}
                       className={`w-full p-3.5 rounded-xl border text-left transition relative cursor-pointer ${
                         isSelected
-                          ? 'bg-[#1e5eff]/15 border-[#1e5eff] shadow-lg shadow-[#1e5eff]/15'
+                          ? 'bg-[#c89b3c]/15 border-[#c89b3c]'
                           : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.04]'
                       }`}
                     >
@@ -313,22 +286,22 @@ export default function BookingSection({
                               {branch.name}
                             </span>
                             {branch.isMain && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#1e5eff]/20 text-[#82aaff] border border-[#1e5eff]/30">
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#c89b3c]/20 text-[#c89b3c] border border-[#c89b3c]/30">
                                 UTAMA
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-white/50 mt-1 line-clamp-1 flex items-center gap-1">
-                            <MapPin className="w-3 h-3 shrink-0 text-[#1e5eff]" />
+                          <p className="text-[11px] text-[#9ca3af] mt-1 line-clamp-1 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 shrink-0 text-[#c89b3c]" />
                             <span>{branch.address}</span>
                           </p>
-                          <p className="text-[10px] text-white/40 mt-1">
+                          <p className="text-[10px] text-[#9ca3af]/80 mt-1">
                             {branch.hours} · 3 Kursi
                           </p>
                         </div>
 
                         {isSelected && (
-                          <div className="w-4 h-4 rounded-full bg-[#1e5eff] text-white flex items-center justify-center shrink-0 mt-0.5">
+                          <div className="w-4 h-4 rounded-full bg-[#c89b3c] text-[#0f1115] flex items-center justify-center shrink-0 mt-0.5 font-bold">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                           </div>
                         )}
@@ -339,64 +312,58 @@ export default function BookingSection({
               </div>
             </div>
 
-            {/* Prosedur & Aturan Reservasi */}
-            <div className="bg-[#0c0c14] border border-white/10 rounded-2xl p-5 space-y-3.5">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-white/70 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#1e5eff]" />
+            <div className="bg-[#181b22] border border-white/10 rounded-2xl p-5 space-y-3.5">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#d1d5db] flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#c89b3c]" />
                 <span>Aturan Reservasi Online</span>
               </h4>
 
               <div className="space-y-3 text-xs">
                 <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-[#1e5eff]/15 text-[#1e5eff] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-5 h-5 rounded-md bg-[#c89b3c]/15 text-[#c89b3c] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     1
                   </div>
-                  <p className="text-white/60 leading-relaxed">
+                  <p className="text-[#9ca3af] leading-relaxed">
                     <strong className="text-white">Pilih Kursi Fisik:</strong> Tiap cabang memiliki tepat 3 kursi yang dapat dipilih secara manual sesuai jadwal.
                   </p>
                 </div>
 
                 <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-[#1e5eff]/15 text-[#1e5eff] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-5 h-5 rounded-md bg-[#c89b3c]/15 text-[#c89b3c] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     2
                   </div>
-                  <p className="text-white/60 leading-relaxed">
+                  <p className="text-[#9ca3af] leading-relaxed">
                     <strong className="text-white">Batas Waktu 24 Jam:</strong> Booking yang berstatus pending akan otomatis kedaluwarsa setelah 24 jam bila belum dikonfirmasi via WhatsApp.
                   </p>
                 </div>
 
                 <div className="flex items-start gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-[#1e5eff]/15 text-[#1e5eff] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-5 h-5 rounded-md bg-[#c89b3c]/15 text-[#c89b3c] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                     3
                   </div>
-                  <p className="text-white/60 leading-relaxed">
-                    <strong className="text-white">Bulan Berjalan:</strong> Reservasi dibuka khusus untuk tanggal-tanggal di bulan berjalan ini agar akurasi rotasi kapster terjaga.
+                  <p className="text-[#9ca3af] leading-relaxed">
+                    <strong className="text-white">Bulan Berjalan:</strong> Reservasi dibuka khusus untuk tanggal-tanggal di bulan berjalan ini agar akurasi jadwal kapster terjaga.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ============================================================== */}
-          {/* KOLOM 2: PILIHAN LAYANAN, BARBER & IDENTITAS (lg:col-span-5)  */}
-          {/* ============================================================== */}
-          <div className="lg:col-span-5 bg-[#0c0c14] border border-white/10 rounded-2xl p-5 sm:p-6 space-y-6">
-            {/* Service Carousel */}
+          {/* Kolom 2: Layanan, Barber & Data Pemesan */}
+          <div className="lg:col-span-5 bg-[#181b22] border border-white/10 rounded-2xl p-5 sm:p-6 space-y-6">
             <ServiceCarousel
               selectedService={draft.service}
               onSelect={handleServiceSelect}
             />
 
-            {/* Barber Carousel */}
             <BarberCarousel
               selectedBarberId={draft.barberId}
               onSelect={handleBarberSelect}
             />
 
-            {/* Customer Contact Form */}
             <div className="space-y-3 pt-4 border-t border-white/10">
-              <label className="text-xs font-semibold uppercase tracking-wider text-white/70 block flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-[#1e5eff]" />
+              <label className="text-xs font-semibold uppercase tracking-wider text-[#d1d5db] block flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#c89b3c]" />
                 <span>3. Data Pemesan</span>
               </label>
 
@@ -404,12 +371,12 @@ export default function BookingSection({
                 <div>
                   <label
                     htmlFor="customer-name"
-                    className="block text-[11px] text-white/60 mb-1"
+                    className="block text-[11px] text-[#9ca3af] mb-1"
                   >
                     Nama Lengkap <span className="text-rose-400">*</span>
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-white/30 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <User className="w-4 h-4 text-[#9ca3af]/40 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       id="customer-name"
                       type="text"
@@ -417,7 +384,7 @@ export default function BookingSection({
                       onChange={(e) => setField('name', e.target.value)}
                       placeholder="Contoh: Budi Santoso"
                       required
-                      className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#1e5eff]"
+                      className="w-full pl-9 pr-3 py-2.5 bg-[#0f1115] border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#c89b3c]"
                     />
                   </div>
                 </div>
@@ -425,12 +392,12 @@ export default function BookingSection({
                 <div>
                   <label
                     htmlFor="customer-phone"
-                    className="block text-[11px] text-white/60 mb-1"
+                    className="block text-[11px] text-[#9ca3af] mb-1"
                   >
                     Nomor WhatsApp <span className="text-rose-400">*</span>
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-white/30 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Phone className="w-4 h-4 text-[#9ca3af]/40 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       id="customer-phone"
                       type="tel"
@@ -438,10 +405,10 @@ export default function BookingSection({
                       onChange={(e) => setField('phone', e.target.value)}
                       placeholder="Contoh: 081234567890"
                       required
-                      className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#1e5eff]"
+                      className="w-full pl-9 pr-3 py-2.5 bg-[#0f1115] border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#c89b3c]"
                     />
                   </div>
-                  <span className="text-[10px] text-white/40 block mt-1">
+                  <span className="text-[10px] text-[#9ca3af] block mt-1">
                     Digunakan untuk pengiriman konfirmasi dan notifikasi jadwal.
                   </span>
                 </div>
@@ -449,19 +416,19 @@ export default function BookingSection({
                 <div>
                   <label
                     htmlFor="customer-notes"
-                    className="block text-[11px] text-white/60 mb-1"
+                    className="block text-[11px] text-[#9ca3af] mb-1"
                   >
                     Catatan Khusus (Opsional)
                   </label>
                   <div className="relative">
-                    <MessageSquare className="w-4 h-4 text-white/30 absolute left-3 top-3" />
+                    <MessageSquare className="w-4 h-4 text-[#9ca3af]/40 absolute left-3 top-3" />
                     <textarea
                       id="customer-notes"
                       rows={2}
                       value={draft.notes}
                       onChange={(e) => setField('notes', e.target.value)}
-                      placeholder="Contoh: Ingin fade tipis samping, bawa anak kecil, dsb."
-                      className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#1e5eff]"
+                      placeholder="Contoh: Fade tipis samping, bawa anak kecil, dsb."
+                      className="w-full pl-9 pr-3 py-2.5 bg-[#0f1115] border border-white/10 rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#c89b3c]"
                     />
                   </div>
                 </div>
@@ -469,12 +436,9 @@ export default function BookingSection({
             </div>
           </div>
 
-          {/* ============================================================== */}
-          {/* KOLOM 3: JADWAL, KURSI & TIKET SUBMIT (lg:col-span-3)          */}
-          {/* ============================================================== */}
+          {/* Kolom 3: Jadwal, Kursi & Tiket */}
           <div className="lg:col-span-3 space-y-5">
-            <div className="bg-[#0c0c14] border border-white/10 rounded-2xl p-5 space-y-5">
-              {/* Date Strip */}
+            <div className="bg-[#181b22] border border-white/10 rounded-2xl p-5 space-y-5">
               <DateStrip
                 selectedDate={draft.date}
                 today={today}
@@ -484,7 +448,6 @@ export default function BookingSection({
                 }}
               />
 
-              {/* Time Slots Grid */}
               <TimeGrid
                 selectedTime={draft.time}
                 availability={availability}
@@ -492,7 +455,6 @@ export default function BookingSection({
                 onSelectTime={handleTimeSelect}
               />
 
-              {/* Chair Selector */}
               <ChairSelector
                 branchId={draft.branchId}
                 selectedChairId={draft.chairId}
@@ -502,15 +464,13 @@ export default function BookingSection({
                 onSelectChair={(chairId) => setField('chairId', chairId)}
               />
 
-              {/* Availability Error Notice */}
               {availabilityError && (
-                <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{availabilityError}</span>
                 </div>
               )}
 
-              {/* Error Feedback */}
               {submitError && (
                 <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -518,21 +478,20 @@ export default function BookingSection({
                 </div>
               )}
 
-              {/* Booking Summary Box */}
-              <div className="p-3.5 bg-white/[0.03] border border-white/10 rounded-xl space-y-2 text-xs">
-                <div className="flex items-center justify-between text-white/60">
+              <div className="p-3.5 bg-[#0f1115] border border-white/10 rounded-xl space-y-2 text-xs">
+                <div className="flex items-center justify-between text-[#9ca3af]">
                   <span>Cabang:</span>
                   <span className="font-semibold text-white">{selectedBranch.shortName}</span>
                 </div>
-                <div className="flex items-center justify-between text-white/60">
+                <div className="flex items-center justify-between text-[#9ca3af]">
                   <span>Waktu:</span>
                   <span className="font-semibold text-white">
                     {draft.time} WIB ({currentServiceItem?.durationMinutes ?? 45}m)
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-white/60">
+                <div className="flex items-center justify-between text-[#9ca3af]">
                   <span>Kursi:</span>
-                  <span className="font-semibold text-[#1e5eff]">
+                  <span className="font-semibold text-[#c89b3c]">
                     {draft.chairId
                       ? draft.chairId.replace(`${draft.branchId}-chair-`, 'Kursi ')
                       : mode === 'consultation'
@@ -542,18 +501,17 @@ export default function BookingSection({
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-white/5 text-sm font-bold text-white">
                   <span>Estimasi:</span>
-                  <span className="font-mono text-[#1e5eff]">{priceFormatted}</span>
+                  <span className="font-mono text-[#c89b3c]">{priceFormatted}</span>
                 </div>
               </div>
 
-              {/* CTA Submit Button */}
               <button
                 type="submit"
                 disabled={submitting || (mode === 'chair' && !draft.chairId)}
-                className="w-full py-3.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#1e5eff] hover:bg-[#1a4ecc] text-white flex items-center justify-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#1e5eff]/25 cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#c89b3c] hover:bg-[#b5892f] text-[#0f1115] flex items-center justify-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#c89b3c]/15 cursor-pointer"
               >
                 {submitting ? (
-                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="inline-block w-4 h-4 border-2 border-[#0f1115]/30 border-t-[#0f1115] rounded-full animate-spin" />
                 ) : (
                   <>
                     <span>
@@ -566,15 +524,14 @@ export default function BookingSection({
                 )}
               </button>
 
-              <p className="text-[10px] text-white/40 text-center leading-relaxed">
-                Slot kursi Anda akan diamankan di database selama 24 jam. Staf kami akan mengirim konfirmasi melalui WhatsApp.
+              <p className="text-[10px] text-[#9ca3af] text-center leading-relaxed">
+                Slot kursi Anda akan diamankan di sistem selama 24 jam. Staf kami akan mengirim konfirmasi melalui WhatsApp.
               </p>
             </div>
           </div>
         </form>
       </div>
 
-      {/* Success Modal */}
       <AnimatePresence>
         {createdBooking && (
           <BookingSuccessModal

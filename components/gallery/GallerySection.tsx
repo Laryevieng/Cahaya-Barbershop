@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye } from 'lucide-react';
 import { GALLERY_DATA } from '@/data';
-import { GalleryItem, GalleryCategory } from '@/types/barbershop';
+import type { GalleryItem, GalleryCategory } from '@/types/barbershop';
 import GalleryModal from './GalleryModal';
 
 interface GallerySectionProps {
@@ -12,11 +12,11 @@ interface GallerySectionProps {
 }
 
 const CATEGORIES: { id: GalleryCategory; label: string }[] = [
-  { id: 'all', label: 'All Portfolio' },
-  { id: 'cuts', label: 'Haircuts & Fades' },
-  { id: 'beard', label: 'Beard Trims' },
-  { id: 'interior', label: 'Studio Interior' },
-  { id: 'process', label: 'Treatments' },
+  { id: 'all', label: 'Semua Foto' },
+  { id: 'cuts', label: 'Potongan & Fade' },
+  { id: 'beard', label: 'Kumis & Jenggot' },
+  { id: 'interior', label: 'Suasana Studio' },
+  { id: 'process', label: 'Perawatan & Cuci' },
 ];
 
 export default function GallerySection({ onBookLook }: GallerySectionProps) {
@@ -33,93 +33,78 @@ export default function GallerySection({ onBookLook }: GallerySectionProps) {
   };
 
   return (
-    <section id="gallery" className="py-28 bg-[#0a0a0d] border-t border-b border-white/5 relative overflow-hidden">
+    <section id="gallery" className="py-24 bg-[#0f1115] border-t border-b border-white/5 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Section Header & Filter Tabs */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            <span className="inline-block text-xs font-bold tracking-[0.3em] text-blue-400 uppercase">
-              PORTFOLIO & ATMOSPHERE
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-white mt-1">
-              Barbershop Gallery
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#f1f1ed]">
+              Dokumentasi Hasil Pangkas
             </h2>
+            <p className="text-xs sm:text-sm text-[#9ca3af] mt-1.5">
+              Koleksi gaya rambut nyata pelanggan dan suasana studio di tiga cabang kami.
+            </p>
           </motion.div>
 
-          {/* Category Filter Pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-wrap gap-2"
-          >
+          <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
+                type="button"
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wider transition-all uppercase ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold tracking-wider transition-colors uppercase cursor-pointer ${
                   activeCategory === cat.id
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(30,94,255,0.4)] border border-blue-400/40'
-                    : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/5'
+                    ? 'bg-[#c89b3c] text-[#0f1115] font-bold'
+                    : 'bg-white/5 hover:bg-white/10 text-[#9ca3af] hover:text-white border border-white/5'
                 }`}
               >
                 {cat.label}
               </button>
             ))}
-          </motion.div>
+          </div>
         </div>
 
-        {/* Gallery Grid Container */}
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
         >
           <AnimatePresence>
             {filteredItems.map((item) => (
               <motion.div
                 key={item.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
                 onClick={() => setSelectedItem(item)}
-                className="group relative rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-black h-72 sm:h-80 shadow-lg"
+                className="group relative rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#181b22] h-72 sm:h-80 shadow-md"
               >
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 filter brightness-90 contrast-105"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 contrast-105"
                 />
 
-                {/* Gradient Info Overlay on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">
-                    {item.category}
-                  </span>
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-white mt-0.5">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-5">
+                  <h3 className="font-serif text-lg font-bold text-white">
                     {item.title}
                   </h3>
-                  <div className="mt-2 flex items-center space-x-1.5 text-xs text-blue-300 font-medium">
-                    <Eye size={14} />
-                    <span>Click to expand image</span>
+                  <div className="mt-1.5 flex items-center space-x-1.5 text-xs text-[#c89b3c] font-medium">
+                    <Eye size={13} />
+                    <span>Lihat foto lebih jelas</span>
                   </div>
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
-
       </div>
 
-      {/* Lightbox Modal */}
       <GalleryModal
         item={selectedItem}
         onClose={() => setSelectedItem(null)}

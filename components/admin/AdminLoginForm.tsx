@@ -39,22 +39,20 @@ export default function AdminLoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-[#0c0c14] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-48 h-48 bg-[#1e5eff]/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="w-full max-w-md bg-[#181b22] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-xl bg-[#1e5eff]/15 border border-[#1e5eff]/30 flex items-center justify-center text-[#1e5eff]">
-          <ShieldCheck className="w-6 h-6" />
+        <div className="w-11 h-11 rounded-xl bg-[#c89b3c]/15 border border-[#c89b3c]/30 flex items-center justify-center text-[#c89b3c]">
+          <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
           <h1 className="text-xl font-bold tracking-tight text-white">
             Admin Reservasi
           </h1>
-          <p className="text-xs text-white/50">Cahaya Barbershop Kuningan</p>
+          <p className="text-xs text-[#9ca3af]">Cahaya Barbershop Kuningan</p>
         </div>
       </div>
 
-      <p className="text-xs text-white/60 mb-6 leading-relaxed">
+      <p className="text-xs text-[#9ca3af] mb-6 leading-relaxed">
         Area ini khusus staf dan pengelola untuk memantau kursi, mengonfirmasi booking, atau melepas slot no-show.
       </p>
 
@@ -69,7 +67,7 @@ export default function AdminLoginForm() {
         <div>
           <label
             htmlFor="admin-password"
-            className="block text-xs font-medium text-white/70 mb-2 uppercase tracking-wider"
+            className="block text-xs font-medium text-[#d1d5db] mb-2 uppercase tracking-wider"
           >
             Password Admin
           </label>
@@ -83,7 +81,7 @@ export default function AdminLoginForm() {
               placeholder="Masukkan password admin..."
               required
               autoFocus
-              className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#1e5eff] focus:ring-1 focus:ring-[#1e5eff] transition"
+              className="w-full pl-10 pr-4 py-3 bg-[#0f1115] border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c89b3c] transition"
             />
           </div>
         </div>
@@ -91,10 +89,10 @@ export default function AdminLoginForm() {
         <button
           type="submit"
           disabled={loading || !password}
-          className="w-full py-3 px-4 rounded-xl font-semibold text-sm bg-[#1e5eff] hover:bg-[#1a4ecc] text-white flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#1e5eff]/20 cursor-pointer"
+          className="w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#c89b3c] hover:bg-[#b5892f] text-[#0f1115] flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#c89b3c]/15 cursor-pointer"
         >
           {loading ? (
-            <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="inline-block w-4 h-4 border-2 border-[#0f1115]/30 border-t-[#0f1115] rounded-full animate-spin" />
           ) : (
             <>
               <span>Masuk Dashboard</span>

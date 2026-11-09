@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Sparkles, Crown, Zap } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { PRICING_PACKAGES } from '@/data';
 import { formatRupiah } from '@/lib/format';
 
@@ -12,98 +12,79 @@ interface PricingSectionProps {
 
 export default function PricingSection({ onSelectPackage }: PricingSectionProps) {
   return (
-    <section id="pricing" className="py-28 bg-[#0a0a0d] border-t border-b border-white/5 relative overflow-hidden">
-      {/* Radial Blue Light Aura */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none"></div>
-
+    <section id="pricing" className="py-24 bg-[#0f1115] border-t border-b border-white/5 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7 }}
-          className="text-center max-w-2xl mx-auto space-y-4 mb-16"
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-2xl mx-auto space-y-3 mb-14"
         >
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-500/30 text-blue-400 text-xs font-bold tracking-widest uppercase">
-            <Crown size={13} />
-            <span>PAKET GROOMING FAVORIT</span>
-          </div>
-          <h2 className="text-3xl sm:text-5xl font-serif font-bold text-white">
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#f1f1ed]">
             Paket Perawatan Populer
           </h2>
-          <p className="text-gray-400 text-sm font-light">
-            Pilihan paket kombinasi terbaik di Cahaya Barbershop untuk kesegaran dan kerapian optimal.
+          <p className="text-[#9ca3af] text-sm leading-relaxed">
+            Pilihan paket kombinasi di Cahaya Barbershop untuk perawatan menyeluruh, bersih, dan rapi.
           </p>
         </motion.div>
 
-        {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          {PRICING_PACKAGES.map((pkg, idx) => (
-            <motion.div
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          {PRICING_PACKAGES.map((pkg) => (
+            <div
               key={pkg.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.6, delay: idx * 0.15 }}
-              whileHover={{ y: -8 }}
-              className={`relative rounded-2xl p-8 sm:p-9 flex flex-col justify-between transition-all duration-500 ${
+              className={`rounded-2xl p-7 flex flex-col justify-between transition-colors bg-[#181b22] border ${
                 pkg.highlighted
-                  ? 'bg-gradient-to-b from-[#0e1d3d] via-[#091224] to-[#050a14] border-2 border-blue-500 shadow-[0_0_50px_rgba(30,94,255,0.35)] lg:-translate-y-4 z-20'
-                  : 'bg-[#0c0c10] border border-white/10 hover:border-white/20'
+                  ? 'border-[#c89b3c]/60 shadow-lg shadow-black/40'
+                  : 'border-white/10 hover:border-white/20'
               }`}
             >
-              {/* Popular Badge */}
-              {pkg.popularBadge && (
-                <div className="absolute -top-3.5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 text-white text-[10px] font-bold tracking-widest px-4 py-1.5 rounded-full uppercase shadow-[0_0_20px_rgba(30,94,255,0.6)] flex items-center space-x-1.5">
-                  <Sparkles size={12} />
-                  <span>{pkg.popularBadge}</span>
-                </div>
-              )}
-
               <div>
-                <div className="flex items-center justify-between">
-                  <h3 className="font-serif text-2xl font-bold text-white tracking-wide">{pkg.name}</h3>
-                  {pkg.highlighted && (
-                    <span className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400">
-                      <Zap size={18} />
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-serif text-xl font-bold text-[#f1f1ed] tracking-wide">
+                    {pkg.name}
+                  </h3>
+                  {pkg.popularBadge && (
+                    <span className="text-[10px] font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#c89b3c]/15 text-[#c89b3c] border border-[#c89b3c]/30 uppercase">
+                      {pkg.popularBadge}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-400 mt-1">{pkg.subtitle}</p>
+                <p className="text-xs text-[#9ca3af] mt-1">{pkg.subtitle}</p>
 
-                <div className="my-6 pb-6 border-b border-white/10">
-                  <span className="text-3xl sm:text-4xl font-serif font-black text-white">{formatRupiah(pkg.priceIdr)}</span>
-                  <span className="text-xs text-gray-400 block mt-1">/ sesi perawatan</span>
+                <div className="my-5 pb-5 border-b border-white/10">
+                  <span className="text-3xl font-serif font-bold text-[#f1f1ed]">
+                    {formatRupiah(pkg.priceIdr)}
+                  </span>
+                  <span className="text-xs text-[#9ca3af] block mt-1">per sesi perawatan</span>
                 </div>
 
-                <ul className="space-y-3.5 my-6">
+                <ul className="space-y-3 my-5">
                   {pkg.features.map((feat, fIdx) => (
-                    <li key={fIdx} className="flex items-start space-x-3 text-xs sm:text-sm text-gray-300 leading-snug">
-                      <CheckCircle2 size={16} className="text-blue-400 shrink-0 mt-0.5" />
+                    <li key={fIdx} className="flex items-start gap-2.5 text-xs text-[#d1d5db] leading-snug">
+                      <div className="w-4 h-4 rounded-full bg-[#c89b3c]/15 text-[#c89b3c] flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-2.5 h-2.5 stroke-[2.5]" />
+                      </div>
                       <span>{feat}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <button
+                type="button"
                 onClick={() => onSelectPackage(pkg.serviceId)}
-                className={`w-full py-4 rounded-xl font-bold text-xs tracking-wider uppercase transition-all mt-6 cursor-pointer ${
+                className={`w-full py-3 px-4 rounded-xl font-bold text-xs tracking-wider uppercase transition-colors mt-6 cursor-pointer ${
                   pkg.highlighted
-                    ? 'bg-gradient-to-r from-[#123C8C] via-[#1E5EFF] to-blue-600 hover:shadow-[0_0_30px_rgba(30,94,255,0.6)] text-white shadow-lg border border-blue-400/40'
-                    : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
+                    ? 'bg-[#c89b3c] hover:bg-[#b5892f] text-[#0f1115] shadow-md shadow-[#c89b3c]/10'
+                    : 'bg-white/5 hover:bg-white/10 text-[#f1f1ed] border border-white/10'
                 }`}
               >
-                PILIH PAKET INI
-              </motion.button>
-            </motion.div>
+                Pilih Paket Ini
+              </button>
+            </div>
           ))}
         </div>
-
       </div>
     </section>
   );

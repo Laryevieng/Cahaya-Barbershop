@@ -26,13 +26,12 @@ export default function BackToTop() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
-          whileHover={{ scale: 1.1, backgroundColor: 'rgba(30, 94, 255, 0.9)' }}
-          whileTap={{ scale: 0.9 }}
+          whileTap={{ scale: 0.95 }}
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-40 p-3 bg-black/70 backdrop-blur-md border border-white/15 text-white rounded-full shadow-xl transition-colors cursor-pointer"
-          aria-label="Scroll to top"
+          className="fixed bottom-6 left-6 z-40 p-3 bg-[#181b22]/90 hover:bg-[#c89b3c] hover:text-[#0f1115] backdrop-blur-md border border-white/15 text-white rounded-full shadow-lg transition-colors cursor-pointer"
+          aria-label="Kembali ke atas"
         >
-          <ChevronUp size={20} />
+          <ChevronUp size={18} />
         </motion.button>
       )}
     </AnimatePresence>

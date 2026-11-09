@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#050505',
+  themeColor: '#0f1115',
 };
 
 export const metadata: Metadata = {
@@ -52,7 +52,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} dark scroll-smooth`}>
-      <body className="bg-[#050505] text-[#EDEDED] antialiased min-h-screen selection:bg-[#1E5EFF] selection:text-white">
+      <body className="bg-[#0f1115] text-[#f1f1ed] antialiased min-h-screen selection:bg-[#c89b3c] selection:text-[#0f1115]">
         {children}
       </body>
     </html>

@@ -253,9 +253,9 @@ export default function AdminDashboard({
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight text-white">
-              Cahaya Barbershop — Admin Reservasi
+              Cahaya Barbershop: Admin Reservasi
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#1e5eff]/20 text-[#1e5eff] border border-[#1e5eff]/30">
+            <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#c89b3c]/15 text-[#c89b3c] border border-[#c89b3c]/30">
               3 Cabang · 3 Kursi
             </span>
           </div>
@@ -265,9 +265,9 @@ export default function AdminDashboard({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <label className="flex items-center gap-2 bg-[#0c0c14] border border-white/10 rounded-xl px-3 py-2 text-xs text-white">
-            <Calendar className="w-3.5 h-3.5 text-[#1e5eff]" />
-            <span className="text-white/60">Bulan:</span>
+          <label className="flex items-center gap-2 bg-[#181b22] border border-white/10 rounded-xl px-3 py-2 text-xs text-white">
+            <Calendar className="w-3.5 h-3.5 text-[#c89b3c]" />
+            <span className="text-[#9ca3af]">Bulan:</span>
             <input
               type="month"
               value={month}
@@ -277,10 +277,11 @@ export default function AdminDashboard({
           </label>
 
           <button
+            type="button"
             onClick={() => reloadData()}
             disabled={isPending}
             title="Muat ulang data"
-            className="p-2.5 rounded-xl bg-[#0c0c14] border border-white/10 hover:border-white/20 text-white/70 hover:text-white transition cursor-pointer"
+            className="p-2.5 rounded-xl bg-[#181b22] border border-white/10 hover:border-white/20 text-[#9ca3af] hover:text-white transition cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isPending ? 'animate-spin' : ''}`} />
           </button>
@@ -288,13 +289,14 @@ export default function AdminDashboard({
           <Link
             href="/"
             target="_blank"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0c0c14] border border-white/10 hover:border-white/20 text-xs text-white/80 hover:text-white transition"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#181b22] border border-white/10 hover:border-white/20 text-xs text-[#9ca3af] hover:text-white transition"
           >
             <span>Lihat Web</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
 
           <button
+            type="button"
             onClick={handleLogout}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-xs text-red-400 transition cursor-pointer"
           >
@@ -350,8 +352,8 @@ export default function AdminDashboard({
           <p className="text-2xl font-bold text-rose-400 mt-1">{stats.cancelled}</p>
           <p className="text-[10px] text-white/40 mt-1">Slot telah dibuka</p>
         </div>
-        <div className="bg-[#0c0c14] border border-white/10 rounded-2xl p-4">
-          <p className="text-[11px] font-medium text-[#1e5eff] uppercase tracking-wider">Hari Ini</p>
+        <div className="bg-[#181b22] border border-white/10 rounded-2xl p-4">
+          <p className="text-[11px] font-medium text-[#c89b3c] uppercase tracking-wider">Hari Ini</p>
           <p className="text-2xl font-bold text-white mt-1">{stats.today}</p>
           <p className="text-[10px] text-white/40 mt-1">Jadwal aktif</p>
         </div>
@@ -368,22 +370,23 @@ export default function AdminDashboard({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari kode booking, nama, atau nomor WA..."
-              className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#1e5eff]"
+              className="w-full pl-10 pr-4 py-2 bg-[#0f1115] border border-white/10 rounded-xl text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#c89b3c]"
             />
           </div>
 
           {/* Branch Filter Pills */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-white/50 mr-1 flex items-center gap-1">
+            <span className="text-[11px] text-[#9ca3af] mr-1 flex items-center gap-1">
               <Building2 className="w-3.5 h-3.5" />
               Cabang:
             </span>
             <button
+              type="button"
               onClick={() => setBranchFilter('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
                 branchFilter === 'all'
-                  ? 'bg-[#1e5eff] text-white'
-                  : 'bg-white/5 text-white/60 hover:text-white'
+                  ? 'bg-[#c89b3c] text-[#0f1115] font-bold'
+                  : 'bg-white/5 text-[#9ca3af] hover:text-white'
               }`}
             >
               Semua
@@ -391,11 +394,12 @@ export default function AdminDashboard({
             {BRANCHES_DATA.map((b) => (
               <button
                 key={b.id}
+                type="button"
                 onClick={() => setBranchFilter(b.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
                   branchFilter === b.id
-                    ? 'bg-[#1e5eff] text-white'
-                    : 'bg-white/5 text-white/60 hover:text-white'
+                    ? 'bg-[#c89b3c] text-[#0f1115] font-bold'
+                    : 'bg-white/5 text-[#9ca3af] hover:text-white'
                 }`}
               >
                 {b.shortName}
@@ -525,7 +529,7 @@ export default function AdminDashboard({
                           <div className="font-medium text-white">
                             {b.branches?.short_name || branch?.shortName || b.branch_id}
                           </div>
-                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-[#1e5eff]/10 text-[#1e5eff] border border-[#1e5eff]/20">
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-[#c89b3c]/10 text-[#c89b3c] border border-[#c89b3c]/20">
                             <Armchair className="w-3 h-3" />
                             <span>{b.chair_label || (b.booking_mode === 'consultation' ? 'Konsultasi' : 'Kursi')}</span>
                           </div>
@@ -538,12 +542,12 @@ export default function AdminDashboard({
                           <div className="text-white font-medium">
                             {formatDateIndonesian(b.booking_date, { withWeekday: true })}
                           </div>
-                          <div className="text-white/70 font-mono text-[11px] flex items-center gap-1">
+                          <div className="text-[#9ca3af] font-mono text-[11px] flex items-center gap-1">
                             <Clock className="w-3 h-3 text-white/40" />
                             <span>
                               {b.start_time.slice(0, 5)} - {b.end_time.slice(0, 5)} WIB
                             </span>
-                            <span className="text-white/40">({b.duration_min}m)</span>
+                            <span className="text-[#9ca3af]/60">({b.duration_min}m)</span>
                           </div>
                         </div>
                       </td>
@@ -552,7 +556,7 @@ export default function AdminDashboard({
                       <td className="py-3.5 px-4 align-top">
                         <div className="space-y-1">
                           <div className="text-white font-medium flex items-center gap-1">
-                            <Scissors className="w-3 h-3 text-[#1e5eff]" />
+                            <Scissors className="w-3 h-3 text-[#c89b3c]" />
                             <span>{b.service_name}</span>
                           </div>
                           <div className="text-white/50 text-[11px]">
