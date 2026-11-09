@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Calendar, BookOpen, Sparkles } from 'lucide-react';
-import { BLOG_DATA } from '@/data/barbershopData';
+import { ChevronRight, Calendar, BookOpen } from 'lucide-react';
+import { BLOG_DATA } from '@/data';
 import { BlogPost } from '@/types/barbershop';
 import BlogModal from './BlogModal';
 

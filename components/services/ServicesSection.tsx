@@ -13,14 +13,14 @@ import {
   ChevronRight,
   Palette,
   Waves,
-  Zap,
-  Sparkle
+  Zap
 } from 'lucide-react';
-import { SERVICES_DATA } from '@/data/barbershopData';
+import { SERVICES_DATA } from '@/data';
+import { formatServicePrice } from '@/lib/format';
 import { ServiceCategory } from '@/types/barbershop';
 
 interface ServicesSectionProps {
-  onSelectService: (serviceName: string) => void;
+  onSelectService: (serviceId: string) => void;
 }
 
 const ICON_MAP = {
@@ -138,7 +138,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
                   <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
                     <div>
                       <span className="block text-lg sm:text-xl font-serif font-black text-white tracking-wide">
-                        {service.price}
+                        {formatServicePrice(service)}
                       </span>
                       {service.time && (
                         <span className="text-[11px] text-gray-400 flex items-center space-x-1 mt-0.5">
@@ -151,7 +151,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => onSelectService(service.name)}
+                      onClick={() => onSelectService(service.id)}
                       className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white text-xs font-bold rounded-lg border border-blue-500/30 transition-all flex items-center space-x-1 cursor-pointer"
                     >
                       <span>BOOK</span>

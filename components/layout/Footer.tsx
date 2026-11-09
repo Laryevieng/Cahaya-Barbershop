@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Scissors, MessageSquare, MapPin, Phone, Heart, ExternalLink } from 'lucide-react';
+import { MessageSquare, ExternalLink } from 'lucide-react';
 import { InstagramIcon } from '@/components/ui/Icons';
-import { SHOP_INFO, BRANCHES_DATA } from '@/data/barbershopData';
+import { SHOP_INFO, BRANCHES_DATA } from '@/data';
 
 interface FooterProps {
   onNavigate: (sectionId: string) => void;

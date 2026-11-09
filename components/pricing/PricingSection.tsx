@@ -3,10 +3,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Sparkles, Crown, Zap } from 'lucide-react';
-import { PRICING_PACKAGES } from '@/data/barbershopData';
+import { PRICING_PACKAGES } from '@/data';
+import { formatRupiah } from '@/lib/format';
 
 interface PricingSectionProps {
-  onSelectPackage: (packageName: string) => void;
+  onSelectPackage: (serviceId: string) => void;
 }
 
 export default function PricingSection({ onSelectPackage }: PricingSectionProps) {
@@ -73,7 +74,7 @@ export default function PricingSection({ onSelectPackage }: PricingSectionProps)
                 <p className="text-xs text-gray-400 mt-1">{pkg.subtitle}</p>
 
                 <div className="my-6 pb-6 border-b border-white/10">
-                  <span className="text-3xl sm:text-4xl font-serif font-black text-white">{pkg.price}</span>
+                  <span className="text-3xl sm:text-4xl font-serif font-black text-white">{formatRupiah(pkg.priceIdr)}</span>
                   <span className="text-xs text-gray-400 block mt-1">/ sesi perawatan</span>
                 </div>
 
@@ -90,7 +91,7 @@ export default function PricingSection({ onSelectPackage }: PricingSectionProps)
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => onSelectPackage(pkg.name)}
+                onClick={() => onSelectPackage(pkg.serviceId)}
                 className={`w-full py-4 rounded-xl font-bold text-xs tracking-wider uppercase transition-all mt-6 cursor-pointer ${
                   pkg.highlighted
                     ? 'bg-gradient-to-r from-[#123C8C] via-[#1E5EFF] to-blue-600 hover:shadow-[0_0_30px_rgba(30,94,255,0.6)] text-white shadow-lg border border-blue-400/40'

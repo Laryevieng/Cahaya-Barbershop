@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight, Quote, MessageSquare } from 'lucide-react';
-import { REVIEWS_DATA } from '@/data/barbershopData';
+import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { REVIEWS_DATA } from '@/data';
 
 export default function ReviewsSection() {
   const [activeIdx, setActiveIdx] = useState(0);
@@ -81,7 +81,7 @@ export default function ReviewsSection() {
 
                 {/* Review Text */}
                 <p className="text-lg sm:text-2xl font-serif italic text-gray-200 max-w-2xl leading-relaxed">
-                  "{activeReview.review}"
+                  &#34;{activeReview.review}&#34;
                 </p>
 
                 {/* Client Avatar & Meta */}

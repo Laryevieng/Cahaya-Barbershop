@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Scissors, Star, Users, Award, Sparkles } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import WebGLHeroCanvas from './WebGLHeroCanvas';
-import { SHOP_INFO } from '@/data/barbershopData';
+import { SHOP_INFO } from '@/data';
 
 interface HeroSectionProps {
   onNavigate: (sectionId: string) => void;

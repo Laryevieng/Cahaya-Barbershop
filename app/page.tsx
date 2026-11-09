@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '@/components/layout/Navbar';
 import HeroSection from '@/components/hero/HeroSection';
 import AboutSection from '@/components/about/AboutSection';
@@ -16,10 +16,12 @@ import ContactSection from '@/components/contact/ContactSection';
 import Footer from '@/components/layout/Footer';
 import FloatingWhatsApp from '@/components/ui/FloatingWhatsApp';
 import BackToTop from '@/components/ui/BackToTop';
+import { useBookingDraft } from '@/hooks/useBookingDraft';
+import { useTodayISO } from '@/hooks/useTodayISO';
 
 export default function Home() {
-  const [selectedService, setSelectedService] = useState<string>('HAIRCUT + WASH');
-  const [selectedBarber, setSelectedBarber] = useState<string>('Any Master Barber');
+  const today = useTodayISO();
+  const { draft, setField } = useBookingDraft({ today });
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -28,23 +30,23 @@ export default function Home() {
     }
   };
 
-  const handleSelectService = (serviceName: string) => {
-    setSelectedService(serviceName);
+  const handleSelectService = (serviceId: string) => {
+    setField('service', { kind: 'catalog', id: serviceId });
     scrollToSection('booking');
   };
 
-  const handleSelectPackage = (packageName: string) => {
-    setSelectedService(packageName);
+  const handleSelectPackage = (serviceId: string) => {
+    setField('service', { kind: 'catalog', id: serviceId });
     scrollToSection('booking');
   };
 
-  const handleSelectBarber = (barberName: string) => {
-    setSelectedBarber(barberName);
+  const handleSelectBarber = (barberId: string) => {
+    setField('barberId', barberId);
     scrollToSection('booking');
   };
 
   const handleBookLook = (lookTitle: string) => {
-    setSelectedService(`Haircut Inspired by: ${lookTitle}`);
+    setField('service', { kind: 'custom', label: `Haircut Inspired by: ${lookTitle}` });
     scrollToSection('booking');
   };
 
@@ -78,10 +80,7 @@ export default function Home() {
       <ReviewsSection />
 
       {/* WhatsApp Online Booking System */}
-      <BookingSection
-        initialService={selectedService}
-        initialBarber={selectedBarber}
-      />
+      <BookingSection draft={draft} today={today} setField={setField} />
 
       {/* Grooming Articles & Guides */}
       <BlogSection />

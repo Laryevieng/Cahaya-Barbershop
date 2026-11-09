@@ -3,10 +3,10 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { Star, Calendar } from 'lucide-react';
 import { InstagramIcon } from '@/components/ui/Icons';
-import { BARBERS_DATA } from '@/data/barbershopData';
+import { BARBERS_DATA } from '@/data';
 
 interface BarbersSectionProps {
-  onSelectBarber: (barberName: string) => void;
+  onSelectBarber: (barberId: string) => void;
 }
 
 export default function BarbersSection({ onSelectBarber }: BarbersSectionProps) {
@@ -290,7 +290,7 @@ const HeaderContent = React.memo(function HeaderContent() {
 interface BarberCardProps {
   barber: (typeof BARBERS_DATA)[number];
   index: number;
-  onSelectBarber: (name: string) => void;
+  onSelectBarber: (barberId: string) => void;
   mobile?: boolean;
 }
 
@@ -390,7 +390,7 @@ const BarberCard = React.memo(function BarberCard({
           </a>
 
           <button
-            onClick={() => onSelectBarber(barber.name)}
+            onClick={() => onSelectBarber(String(barber.id))}
             className={`font-bold uppercase text-[10px] tracking-wider flex items-center space-x-1 px-3 py-1.5 rounded border transition-colors duration-200 cursor-pointer ${
               barber.isFounder
                 ? 'text-amber-300 bg-amber-950/60 border-amber-500/40 hover:bg-amber-500 hover:text-black'

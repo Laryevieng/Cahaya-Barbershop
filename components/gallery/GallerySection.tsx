@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, Sparkles, Filter } from 'lucide-react';
-import { GALLERY_DATA } from '@/data/barbershopData';
+import { Eye } from 'lucide-react';
+import { GALLERY_DATA } from '@/data';
 import { GalleryItem, GalleryCategory } from '@/types/barbershop';
 import GalleryModal from './GalleryModal';
 

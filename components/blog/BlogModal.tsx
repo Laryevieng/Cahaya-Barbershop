@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Clock, BookOpen, User } from 'lucide-react';
+import { X, Calendar, Clock, User } from 'lucide-react';
 import { BlogPost } from '@/types/barbershop';
 
 interface BlogModalProps {

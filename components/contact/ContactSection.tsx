@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   MapPin,
   Phone,
@@ -9,11 +9,9 @@ import {
   MessageSquare,
   ExternalLink,
   Navigation,
-  Sparkles,
-  Building2,
-  CheckCircle2
+  Building2
 } from 'lucide-react';
-import { BRANCHES_DATA, SHOP_INFO } from '@/data/barbershopData';
+import { BRANCHES_DATA, SHOP_INFO } from '@/data';
 import { Branch } from '@/types/barbershop';
 
 export default function ContactSection() {

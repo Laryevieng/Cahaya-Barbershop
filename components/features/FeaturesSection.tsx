@@ -2,16 +2,18 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Scissors, Sparkles, Crown, Award } from 'lucide-react';
-import { FEATURES_DATA } from '@/data/barbershopData';
+import { Scissors, Sparkles, Crown, Award, ShieldCheck, Clock } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { FEATURES_DATA } from '@/data';
+import type { ShopFeature } from '@/types/barbershop';
 
-const ICON_MAP = {
+const ICON_MAP: Record<ShopFeature['iconName'], LucideIcon> = {
   Scissors,
   Sparkles,
   Crown,
   Award,
-  ShieldCheck: Scissors,
-  Clock: Scissors,
+  ShieldCheck,
+  Clock,
 };
 
 export default function FeaturesSection() {

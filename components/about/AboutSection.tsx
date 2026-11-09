@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Scissors, Sparkles, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Scissors, Sparkles } from 'lucide-react';
 
 export default function AboutSection() {
   return (

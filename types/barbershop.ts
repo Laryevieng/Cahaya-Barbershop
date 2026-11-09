@@ -1,23 +1,36 @@
 export type ServiceCategory = 'haircut' | 'color' | 'others';
 
+export type ServiceIconName =
+  | 'Scissors'
+  | 'Sparkles'
+  | 'Crown'
+  | 'Flame'
+  | 'ShieldCheck'
+  | 'Award'
+  | 'Palette'
+  | 'Waves'
+  | 'Zap';
+
 export interface ServiceItem {
   id: string;
-  category: 'haircut' | 'color' | 'others';
+  category: ServiceCategory;
   name: string;
-  price: string;
-  numericPrice?: number;
+  priceIdr: number;
+  priceMaxIdr?: number;
+  pricePrefix?: 'Mulai';
+  priceSuffix?: '+';
   time?: string;
   desc: string;
-  iconName: 'Scissors' | 'Sparkles' | 'Crown' | 'Flame' | 'ShieldCheck' | 'Award' | 'Palette' | 'Waves' | 'Zap';
+  iconName: ServiceIconName;
   tag?: string;
 }
 
 export interface PricingPackage {
   id: string;
+  serviceId: string;
   name: string;
   subtitle: string;
-  price: string;
-  numericPrice?: number;
+  priceIdr: number;
   highlighted: boolean;
   popularBadge?: string;
   features: string[];
@@ -78,12 +91,16 @@ export interface Branch {
   hours: string;
 }
 
-export interface BookingState {
+export type ServiceSelection =
+  | { kind: 'catalog'; id: string }
+  | { kind: 'custom'; label: string };
+
+export interface BookingDraft {
   name: string;
   phone: string;
-  branch: string;
-  service: string;
-  barber: string;
+  branchId: string;
+  service: ServiceSelection;
+  barberId: string;
   date: string;
   time: string;
   notes: string;

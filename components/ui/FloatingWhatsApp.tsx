@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare } from 'lucide-react';
-import { SHOP_INFO } from '@/data/barbershopData';
+import { SHOP_INFO } from '@/data';
 
 export default function FloatingWhatsApp() {
   const waUrl = `https://wa.me/${SHOP_INFO.whatsapp}?text=Halo%20CAHAYA%20BARBERSHOP,%20saya%20ingin%20tanya%20mengenai%20layanan%20barbershop.`;
