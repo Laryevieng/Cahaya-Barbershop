@@ -12,7 +12,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onNavigate }: HeroSectionProps) {
   return (
-    <section id="home" className="relative min-h-screen flex items-center pt-28 pb-20 overflow-hidden bg-[#050505]">
+    <section id="home" className="relative min-h-[100svh] flex items-center pt-28 pb-20 overflow-hidden bg-[#050505]">
       {/* Procedural WebGL Background Shader */}
       <WebGLHeroCanvas />
 

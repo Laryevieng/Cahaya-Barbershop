@@ -154,7 +154,7 @@ export default function Navbar({ onNavigate }: NavbarProps) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="lg:hidden bg-[#070709]/98 backdrop-blur-2xl border-b border-white/10 px-6 py-6 space-y-4 overflow-hidden"
+            className="lg:hidden bg-[#070709]/98 backdrop-blur-2xl border-b border-white/10 px-6 py-6 space-y-4 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain"
           >
             <div className="flex items-center space-x-3 pb-3 border-b border-white/10">
               <div className="w-9 h-9 rounded-full p-0.5 bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-md shrink-0">

@@ -39,7 +39,7 @@ export default function PricingSection({ onSelectPackage }: PricingSectionProps)
         </motion.div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
           {PRICING_PACKAGES.map((pkg, idx) => (
             <motion.div
               key={pkg.id}
@@ -50,7 +50,7 @@ export default function PricingSection({ onSelectPackage }: PricingSectionProps)
               whileHover={{ y: -8 }}
               className={`relative rounded-2xl p-8 sm:p-9 flex flex-col justify-between transition-all duration-500 ${
                 pkg.highlighted
-                  ? 'bg-gradient-to-b from-[#0e1d3d] via-[#091224] to-[#050a14] border-2 border-blue-500 shadow-[0_0_50px_rgba(30,94,255,0.35)] md:-translate-y-4 z-20'
+                  ? 'bg-gradient-to-b from-[#0e1d3d] via-[#091224] to-[#050a14] border-2 border-blue-500 shadow-[0_0_50px_rgba(30,94,255,0.35)] lg:-translate-y-4 z-20'
                   : 'bg-[#0c0c10] border border-white/10 hover:border-white/20'
               }`}
             >
